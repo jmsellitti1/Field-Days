@@ -236,9 +236,11 @@ def update_excel(filename: str):
 
 # Main method to call functions and parse data
 def main():
-    filename = "/Users/jacob/Desktop/Projects/Field Days/Field Days.xlsx"
+    filename = "./Field Days.xlsx"
     read_excel(filename)
+    print("Excel file read")
     parse_days(days)
+    print("Days parsed")
     update_excel(filename)
     print(f"Excel file updated with {len(days)} field days.")
 
