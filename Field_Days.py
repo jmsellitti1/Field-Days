@@ -124,7 +124,10 @@ def remove_player(rem_player: Player, player_list: list[Player]) -> list[Player]
 def update_team_lists(team: list[Player]):
     for player in team:
         for other_player in remove_player(player, team):
-            player.teammates[other_player.name] += 1
+            if other_player.name in player.teammates:
+                player.teammates[other_player.name] += 1
+            else:
+                player.teammates[other_player.name] = 1
 
 
 # Update an individual stat with appropriate win and loss counts, also check for 0-0 record to avoid division by 0
@@ -164,12 +167,6 @@ def read_excel(filename: str):
 
 # Iterate through list of days, determine winner of each game and increment stats
 def parse_days(days_list: list[Day]):
-    # Initiate dictionaries for teammate frequency now that all Player objects have been created
-    for player in players:
-        for other_player in remove_player(player, players):
-            player.teammates[other_player.name] = 0
-        player.teammates = dict(sorted(player.teammates.items(), key=lambda d: d[0].lower()))
-
     for day in days_list:
         update_team_lists(day.team1)
         update_team_lists(day.team2)
@@ -208,6 +205,8 @@ def update_excel(filename: str):
 
     sorted_players = sorted(players, key=lambda p: p.name.lower())
 
+    # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS OR GAMES ARE ADDED
+
     for player in sorted_players:
         wins = [player.days_w, player.games_w, player.pk_w, player.cross_w,
                 player.ad_w, player.pf_w, player.ss_w, player.fk_w]
@@ -225,9 +224,8 @@ def update_excel(filename: str):
         stats.at[(sorted_players.index(player)), 'Clown'] = player.clown
         stats.at[(sorted_players.index(player)), '(Name)'] = player.name
 
-        # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS ARE ADDED
         for teammate in player.teammates.items():
-            teams.at[(sorted_players.index(player)), teammate[0]] = teammate[1]
+            teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (player.days_w + player.days_l), 3)
 
     with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
