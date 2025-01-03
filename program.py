@@ -1,7 +1,8 @@
 import pandas as pd
+import sys
 
 
-# Empty list of players and days, to be filled as Excel sheet is read
+# Global lists of players and days
 players = []
 days = []
 
@@ -86,6 +87,7 @@ def add_win(game: str, team: list[Player], amt: int = 1):
             player.games_w += amt
         else:
             print(f"Game {game} does not exist!")
+            sys.exit(1)
 
 
 # Add loss to all players on a team for a given game
@@ -109,6 +111,7 @@ def add_loss(game: str, team: list[Player], amt: int = 1):
             player.games_l += amt
         else:
             print(f"Game {game} does not exist!")
+            sys.exit(1)
 
 
 # Returns list of players minus the one specified
@@ -141,8 +144,39 @@ def update_stat(table, player_num: int, wins: int, losses: int, record: str, pct
 
 # Read Excel sheet of days/games, and isolate teams + scores for each
 def read_excel(filename: str):
-    df = pd.read_excel(filename, sheet_name="Days")
-    for index, row in df.iterrows():
+    excel_df = pd.read_excel(filename, sheet_name="Days")
+    new_day_check = input("Is there a new field day to input? (y): ").lower()
+    if new_day_check == "y":
+        nd_date = input("Date: ")
+        nd_team1 = input("Team 1 Players: ")
+        nd_team2 = input("Team 2 Players: ")
+        nd_score = input("Score: ")
+        nd_row = [nd_date, nd_team1, nd_team2, nd_score]
+        while True:
+            nd_game = input("Next Game: ")
+            if not nd_game:
+                while len(nd_row) < 11:
+                    nd_row.append(None)
+                break
+            else:
+                nd_row.append(nd_game)
+        mvp = input("MVP: ")
+        if mvp == "":
+            nd_row.append(None)
+        else:
+            nd_row.append(mvp)
+        clown = input("Clown: ")
+        if clown == "":
+            nd_row.append(None)
+        else:
+            nd_row.append(clown)
+        row_check = input(f"Confirm new day (y): {nd_row}\n").lower()
+        if row_check == "y" or not row_check:
+            excel_df.loc[len(excel_df)] = nd_row
+            with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                excel_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
+    
+    for index, row in excel_df.iterrows():
         team1 = init_team(row['Team 1'].split(", "))
         team2 = init_team(row['Team 2'].split(", "))
         score = row['Score']
@@ -153,7 +187,7 @@ def read_excel(filename: str):
             today_clown = get_player(row['Clown of the Match'])
             today_clown.clown += 1
 
-        game_columns = [col for col in df.columns if col.startswith('Game')]
+        game_columns = [col for col in excel_df.columns if col.startswith('Game')]
         games = []
         for game_col in game_columns:
             game_data = row[game_col]
