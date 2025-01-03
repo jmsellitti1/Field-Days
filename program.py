@@ -2,13 +2,12 @@ import pandas as pd
 import sys
 
 
-# Global lists of players and days
+# Global lists of players and names for season resets
 players = []
-days = []
+player_names = ["Aaron",  "AB",  "Anthony",  "Brandon", "Eric", "Jacob", "Kiernan", "Quinn", "Sam G", "Sam S", "Tighe"]
 
 
 # CLASS/OBJECT DEFINITIONS
-
 
 # Object to represent a player, including values for each game to keep track of stats
 class Player:
@@ -25,7 +24,7 @@ class Player:
 
         self.mvp, self.clown = 0, 0
 
-        self.teammates = {}
+        self.teammates = {name: 0 for name in player_names}
 
 
 # Object to represent a game, including its name and score
@@ -127,10 +126,7 @@ def remove_player(rem_player: Player, player_list: list[Player]) -> list[Player]
 def update_team_lists(team: list[Player]):
     for player in team:
         for other_player in remove_player(player, team):
-            if other_player.name in player.teammates:
-                player.teammates[other_player.name] += 1
-            else:
-                player.teammates[other_player.name] = 1
+            player.teammates[other_player.name] += 1
 
 
 # Update an individual stat with appropriate win and loss counts, also check for 0-0 record to avoid division by 0
@@ -143,61 +139,70 @@ def update_stat(table, player_num: int, wins: int, losses: int, record: str, pct
 
 
 # Read Excel sheet of days/games, and isolate teams + scores for each
-def read_excel(filename: str):
+# Optional: season parameter only reads days from a given year (as a 2 digit number)
+def read_excel(filename: str, season: int = None):
+    # Reset player stats for each season
+    global players, player_names
+    players = [Player(name) for name in player_names]
+    days = []
     days_df = pd.read_excel(filename, sheet_name="Days")
-    new_day_check = input("Is there a new field day to input? (y): ").lower()
-    if new_day_check == "y":
-        nd_date = input("Date: ")
-        nd_team1 = input("Team 1 Players: ")
-        nd_team2 = input("Team 2 Players: ")
-        nd_score = input("Score: ")
-        nd_row = [nd_date, nd_team1, nd_team2, nd_score]
-        while True:
-            nd_game = input("Next Game: ")
-            if not nd_game:
-                while len(nd_row) < 11:
-                    nd_row.append(None)
-                break
+    if not season:
+        new_day_check = input("Is there a new field day to input? (y): ").lower()
+        if new_day_check == "y":
+            # Add new day to dataframe
+            nd_date = input("Date: ")
+            nd_team1 = input("Team 1 Players: ")
+            nd_team2 = input("Team 2 Players: ")
+            nd_score = input("Score: ")
+            nd_row = [nd_date, nd_team1, nd_team2, nd_score]
+            while True:
+                nd_game = input("Next Game: ")
+                if not nd_game:
+                    while len(nd_row) < 11:
+                        nd_row.append(None)
+                    break
+                else:
+                    nd_row.append(nd_game)
+            mvp = input("MVP: ")
+            if mvp == "":
+                nd_row.append(None)
             else:
-                nd_row.append(nd_game)
-        mvp = input("MVP: ")
-        if mvp == "":
-            nd_row.append(None)
-        else:
-            nd_row.append(mvp)
-        clown = input("Clown: ")
-        if clown == "":
-            nd_row.append(None)
-        else:
-            nd_row.append(clown)
-        row_check = input(f"Confirm new day (y): {nd_row}\n").lower()
-        if row_check == "y" or not row_check:
-            days_df.loc[len(days_df)] = nd_row
-            with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-                days_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
+                nd_row.append(mvp)
+            clown = input("Clown: ")
+            if clown == "":
+                nd_row.append(None)
+            else:
+                nd_row.append(clown)
+            row_check = input(f"Confirm new day (y): {nd_row}\n").lower()
+            if row_check == "y" or not row_check:
+                days_df.loc[len(days_df)] = nd_row
+                with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                    days_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
     
     for index, row in days_df.iterrows():
-        team1 = init_team(row['Team 1'].split(", "))
-        team2 = init_team(row['Team 2'].split(", "))
-        score = row['Score']
-        if isinstance(row['MVP'], str) is True:
-            today_mvp = get_player(row['MVP'])
-            today_mvp.mvp += 1
-        if isinstance(row['Clown of the Match'], str) is True:
-            today_clown = get_player(row['Clown of the Match'])
-            today_clown.clown += 1
+        if not season or (season and row['Date'].split("/")[-1] == str(season)):
+            team1 = init_team(row['Team 1'].split(", "))
+            team2 = init_team(row['Team 2'].split(", "))
+            score = row['Score']
+            if isinstance(row['MVP'], str) is True:
+                today_mvp = get_player(row['MVP'])
+                today_mvp.mvp += 1
+            if isinstance(row['Clown of the Match'], str) is True:
+                today_clown = get_player(row['Clown of the Match'])
+                today_clown.clown += 1
 
-        game_columns = [col for col in days_df.columns if col.startswith('Game')]
-        games = []
-        for game_col in game_columns:
-            game_data = row[game_col]
-            if pd.notna(game_data):
-                game_name, game_score = game_data.split(" ")
-                game_score = game_score[1:-1]  # Removing parentheses around score
-                games.append(Game(game_name, game_score))
+            game_columns = [col for col in days_df.columns if col.startswith('Game')]
+            games = []
+            for game_col in game_columns:
+                game_data = row[game_col]
+                if pd.notna(game_data):
+                    game_name, game_score = game_data.split(" ")
+                    game_score = game_score[1:-1]  # Removing parentheses around score
+                    games.append(Game(game_name, game_score))
 
-        days.append(Day(team1, team2, score, games))
+            days.append(Day(team1, team2, score, games))
 
+    return days
 
 # Iterate through list of days, determine winner of each game and increment stats
 def parse_days(days_list: list[Day]):
@@ -233,14 +238,13 @@ def parse_days(days_list: list[Day]):
 
 
 # Update Excel sheet with stats
-def update_excel(filename: str):
+def update_excel(filename: str, season = None):
     stats = pd.read_excel(filename, sheet_name="Stats")
     teams = pd.read_excel(filename, sheet_name="Teams")
-
+    
     sorted_players = sorted(players, key=lambda p: p.name.lower())
 
     # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS OR GAMES ARE ADDED
-
     for player in sorted_players:
         wins = [player.days_w, player.games_w, player.pk_w, player.cross_w,
                 player.ad_w, player.pf_w, player.ss_w, player.fk_w]
@@ -258,23 +262,32 @@ def update_excel(filename: str):
         stats.at[(sorted_players.index(player)), 'Clown'] = player.clown
         stats.at[(sorted_players.index(player)), '(Name)'] = player.name
 
-        for teammate in player.teammates.items():
-            teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (player.days_w + player.days_l), 3)
-
+        if not season:
+            for teammate in player.teammates.items():
+                teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (player.days_w + player.days_l), 3)
+                
     with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-        stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
-        teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
+        if season:
+            stats.to_excel(writer, sheet_name='20' + str(season) + ' Stats', index=False, startrow=0, startcol=0)
+        else:
+            stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
+            teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
 
 
 # Main method to call functions and parse data
 def main():
     filename = "./Field_Days.xlsx"
-    read_excel(filename)
+    days = read_excel(filename)
     print("Excel file read")
     parse_days(days)
-    print("Days parsed")
+    print("All days parsed")
     update_excel(filename)
-    print(f"Excel file updated with {len(days)} field days.")
+    for i in range(24, 26): # Manually update when more seasons are played
+        yr_days = read_excel(filename, i)
+        parse_days(yr_days)
+        print(f"{len(yr_days)} days parsed for 20{i}")
+        update_excel(filename, i)
+    print(f"Excel file updated with {len(days)} total field days.")
 
 
 # On start:
