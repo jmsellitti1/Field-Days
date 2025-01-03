@@ -144,7 +144,7 @@ def update_stat(table, player_num: int, wins: int, losses: int, record: str, pct
 
 # Read Excel sheet of days/games, and isolate teams + scores for each
 def read_excel(filename: str):
-    excel_df = pd.read_excel(filename, sheet_name="Days")
+    days_df = pd.read_excel(filename, sheet_name="Days")
     new_day_check = input("Is there a new field day to input? (y): ").lower()
     if new_day_check == "y":
         nd_date = input("Date: ")
@@ -172,11 +172,11 @@ def read_excel(filename: str):
             nd_row.append(clown)
         row_check = input(f"Confirm new day (y): {nd_row}\n").lower()
         if row_check == "y" or not row_check:
-            excel_df.loc[len(excel_df)] = nd_row
+            days_df.loc[len(days_df)] = nd_row
             with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-                excel_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
+                days_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
     
-    for index, row in excel_df.iterrows():
+    for index, row in days_df.iterrows():
         team1 = init_team(row['Team 1'].split(", "))
         team2 = init_team(row['Team 2'].split(", "))
         score = row['Score']
@@ -187,7 +187,7 @@ def read_excel(filename: str):
             today_clown = get_player(row['Clown of the Match'])
             today_clown.clown += 1
 
-        game_columns = [col for col in excel_df.columns if col.startswith('Game')]
+        game_columns = [col for col in days_df.columns if col.startswith('Game')]
         games = []
         for game_col in game_columns:
             game_data = row[game_col]
