@@ -135,7 +135,7 @@ def update_stat(table, player_num: int, wins: int, losses: int, record: str, pct
     table.at[player_num, pct] = 0 if wins == 0 and losses == 0 else round(wins / (wins + losses), 4)
 
 
-# ACTUAL PROGRAM
+# ACTUAL PROGRAM STARTS HERE
 
 
 # Read Excel sheet of days/games, and isolate teams + scores for each
@@ -276,7 +276,7 @@ def update_excel(filename: str, season = None):
 
 # Main method to call functions and parse data
 def main():
-    filename = "./Field_Days.xlsx"
+    filename = "./Field_Days.xlsx" # Source file
     days = read_excel(filename)
     print("Excel file read")
     parse_days(days)
