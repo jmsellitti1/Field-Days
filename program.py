@@ -180,7 +180,7 @@ def read_excel(filename: str, season: int = None):
                     days_df.to_excel(writer, sheet_name='Days', index=False, startrow=0, startcol=0)
     
     for index, row in days_df.iterrows():
-        if not season or (season and row['Date'].split("/")[-1] == str(season)):
+        if not season or (season and str(row['Date']).split("/")[-1] == str(season)):
             team1 = init_team(row['Team 1'].split(", "))
             team2 = init_team(row['Team 2'].split(", "))
             score = row['Score']
