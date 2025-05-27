@@ -135,9 +135,6 @@ def update_stat(table, player_num: int, wins: int, losses: int, record: str, pct
     table.at[player_num, pct] = 0 if wins == 0 and losses == 0 else round(wins / (wins + losses), 4)
 
 
-# ACTUAL PROGRAM STARTS HERE
-
-
 # Read Excel sheet of days/games, and isolate teams + scores for each
 # Optional: season parameter only reads days from a given year (as a 2 digit number)
 def read_excel(filename: str, season: int = None):
@@ -184,10 +181,10 @@ def read_excel(filename: str, season: int = None):
             team1 = init_team(row['Team 1'].split(", "))
             team2 = init_team(row['Team 2'].split(", "))
             score = row['Score']
-            if isinstance(row['MVP'], str) is True:
+            if isinstance(row['MVP'], str):
                 today_mvp = get_player(row['MVP'])
                 today_mvp.mvp += 1
-            if isinstance(row['Clown of the Match'], str) is True:
+            if isinstance(row['Clown of the Match'], str):
                 today_clown = get_player(row['Clown of the Match'])
                 today_clown.clown += 1
 
@@ -244,6 +241,7 @@ def update_excel(filename: str, season = None):
     
     sorted_players = sorted(players, key=lambda p: p.name.lower())
 
+
     # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS OR GAMES ARE ADDED
     for player in sorted_players:
         wins = [player.days_w, player.games_w, player.pk_w, player.cross_w,
@@ -261,7 +259,8 @@ def update_excel(filename: str, season = None):
         stats.at[(sorted_players.index(player)), 'MVP'] = player.mvp
         stats.at[(sorted_players.index(player)), 'Clown'] = player.clown
         stats.at[(sorted_players.index(player)), '(Name)'] = player.name
-
+        
+        # Update teammate frequency table
         if not season:
             for teammate in player.teammates.items():
                 teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (player.days_w + player.days_l), 3)
