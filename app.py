@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import pandas as pd
 import os
 
@@ -18,6 +18,10 @@ def index():
                          stats=stats.to_dict('records'),
                          teams=teams.to_dict('records'),
                          days=days.to_dict('records'))
+
+@app.route('/health')
+def health_check():
+    return jsonify({"status": "healthy", "message": "Application is running"})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
