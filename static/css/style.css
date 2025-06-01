@@ -1,0 +1,280 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --background-color: #f8fafc;
+    --text-color: #1e293b;
+    --border-color: #e2e8f0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+header {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid var(--border-color);
+}
+
+button:hover {
+    background-color: var(--background-color);
+}
+
+button.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+section {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+section.active {
+    display: block;
+}
+
+.table-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+th, td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: var(--background-color);
+    font-weight: 600;
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+tr:hover td {
+    background-color: var(--background-color);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    nav {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+
+    th, td {
+        padding: 0.75rem;
+    }
+}
+
+/* Game History Styles */
+.expand-btn {
+    padding: 0.25rem;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.expand-btn:hover {
+    background: var(--background-color);
+    color: var(--primary-color);
+}
+
+.expand-btn.expanded {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: rotate(90deg);
+}
+
+.games-details {
+    display: none !important;
+}
+
+.games-details.expanded {
+    display: table-row !important;
+    animation: fadeIn 0.2s ease-in;
+}
+
+.games-details td {
+    background-color: var(--background-color);
+}
+
+.games-list {
+    padding: 0.75rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.game-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    width: fit-content;
+}
+
+.game-name {
+    font-weight: 500;
+    color: var(--text-color);
+    min-width: 60px;
+}
+
+.game-score {
+    font-family: monospace;
+    background: var(--background-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+}
+
+/* Update existing styles */
+.day-row:hover td {
+    background-color: var(--background-color);
+}
+
+.day-row td {
+    transition: background-color 0.2s;
+}
+
+.day-row:hover .expand-btn {
+    color: var(--primary-color);
+}
+
+/* Team Combinations Table Styles */
+.team-combinations {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.team-combinations th,
+.team-combinations td {
+    text-align: center;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.team-combinations .corner-header {
+    background-color: var(--background-color);
+    font-weight: 600;
+}
+
+.team-combinations .player-header {
+    background-color: var(--background-color);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.team-combinations .combination-cell {
+    transition: background-color 0.2s;
+}
+
+.team-combinations .combination-cell:hover {
+    background-color: var(--background-color);
+}
+
+.team-combinations .same-player {
+    background-color: #f5f5f5;
+}
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+    .team-combinations {
+        font-size: 0.9rem;
+    }
+    
+    .team-combinations th,
+    .team-combinations td {
+        padding: 0.5rem;
+    }
+} 
