@@ -99,25 +99,45 @@
                         <thead>
                             <tr>
                                 <th class="corner-header">Players</th>
-                                {% for player in teams[0].keys() if player not in ['(Name)', 'Name', 'Player B'] %}
-                                <th class="player-header">{{ player }}</th>
+                                {% set players = [] %}
+                                {% for row in teams %}
+                                    {% if row.Name and row.Name|string not in players and row.Name not in ["Frequency of Players A and B being on the same team (As a percentage of days that Player A has played)", "Player A", "nan", "NaN"] %}
+                                        {% set _ = players.append(row.Name|string) %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% for player in players|sort %}
+                                    {% if player|string != "nan" and player|string != "NaN" %}
+                                        <th class="player-header">{{ player }}</th>
+                                    {% endif %}
                                 {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in teams %}
-                            <tr>
-                                <td class="player-header">{{ row['(Name)'] }}</td>
-                                {% for col_player in teams[0].keys() if col_player not in ['(Name)', 'Name', 'Player B'] %}
-                                <td class="combination-cell {% if row['(Name)'] == col_player %}same-player{% endif %}">
-                                    {% if row['(Name)'] == col_player %}
-                                        -
-                                    {% else %}
-                                        {{ "%.1f"|format(row[col_player] * 100) if row[col_player] not in [0, '-', None] else '-' }}%
-                                    {% endif %}
-                                </td>
-                                {% endfor %}
-                            </tr>
+                            {% for row_player in players|sort %}
+                                {% if row_player|string != "nan" and row_player|string != "NaN" %}
+                                <tr>
+                                    <td class="player-header">{{ row_player }}</td>
+                                    {% for col_player in players|sort %}
+                                        {% if col_player|string != "nan" and col_player|string != "NaN" %}
+                                        <td class="combination-cell {% if row_player == col_player %}same-player{% endif %}">
+                                            {% if row_player == col_player %}
+                                                -
+                                            {% else %}
+                                                {% for row in teams %}
+                                                    {% if row.Name|string == row_player %}
+                                                        {% if row[col_player] is defined and row[col_player] is not none %}
+                                                            {{ "%.1f"|format(row[col_player] * 100) }}%
+                                                        {% else %}
+                                                            -
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>
