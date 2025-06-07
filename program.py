@@ -326,6 +326,24 @@ def update_stat(table: pd.DataFrame, player_num: int, wins: int, losses: int, re
     table.at[player_num, pct] = 0 if wins == 0 and losses == 0 else round(wins / (wins + losses), 4)
 
 
+def validate_score(score_str: str) -> bool:
+    """Validate score string format (X-Y).
+    
+    Args:
+        score_str (str): Score string to validate
+        
+    Returns:
+        bool: True if valid, False otherwise
+    """
+    try:
+        score1, score2 = map(int, score_str.split("-"))
+        if score1 < 0 or score2 < 0:
+            return False
+        return True
+    except ValueError:
+        return False
+
+
 def get_new_day_input() -> List:
     """Prompts the user for all necessary information about a new field day,
     including date, teams, scores, and awards.
@@ -339,39 +357,115 @@ def get_new_day_input() -> List:
     print("\nEntering new field day data:")
     print("----------------------------")
     
-    nd_date = input("Date (MM/DD/YY): ").strip()
-    nd_team1 = input("Team 1 Players (comma-separated): ").strip()
-    nd_team2 = input("Team 2 Players (comma-separated): ").strip()
-    nd_score = input("Score (X-Y): ").strip()
+    # Get and validate date
+    while True:
+        nd_date = input("Date (MM/DD/YY): ").strip()
+        try:
+            month, day, year = map(int, nd_date.split("/"))
+            if 1 <= month <= 12 and 1 <= day <= 31 and 0 <= year <= 99:
+                break
+            print("Error: Invalid date values. Month: 1-12, Day: 1-31, Year: 00-99")
+        except ValueError:
+            print("Error: Invalid date format. Use MM/DD/YY (e.g., 05/15/24)")
+    
+    # Get and validate teams
+    while True:
+        nd_team1 = input("Team 1 Players (comma-separated): ").strip()
+        team1_players = [p.strip() for p in nd_team1.split(",")]
+        if all(p in player_names for p in team1_players):
+            break
+        print("Error: Unknown player(s) in Team 1.")
+        print("Valid players:", ", ".join(player_names))
+    
+    while True:
+        nd_team2 = input("Team 2 Players (comma-separated): ").strip()
+        team2_players = [p.strip() for p in nd_team2.split(",")]
+        if all(p in player_names for p in team2_players):
+            break
+        print("Error: Unknown player(s) in Team 2.")
+        print("Valid players:", ", ".join(player_names))
+    
+    # Get and validate day score
+    while True:
+        nd_score = input("Score (X-Y): ").strip()
+        if validate_score(nd_score):
+            break
+        print("Error: Invalid score format. Use X-Y where X and Y are non-negative numbers")
     
     nd_row = [nd_date, nd_team1, nd_team2, nd_score]
     
-    print("\nEnter game results (press Enter with no input when done):")
+    # Track all players for award validation
+    all_players = set(team1_players + team2_players)
+    
+    print("\nValid game types:", ", ".join(CONFIG["GAME_TYPES"].keys()))
+    print("Enter game results (press Enter with no input when done):")
     while True:
         nd_game = input("Next Game (format: 'GameType (X-Y)'): ").strip()
         if not nd_game:
             while len(nd_row) < 11:
                 nd_row.append(None)
             break
-        nd_row.append(nd_game)
+        
+        try:
+            game_type, score = nd_game.split(" ", 1)
+            if game_type not in CONFIG["GAME_TYPES"]:
+                print(f"Error: '{game_type}' is not a valid game type.")
+                print("Valid types:", ", ".join(CONFIG["GAME_TYPES"].keys()))
+                continue
+            
+            if not (score.startswith("(") and score.endswith(")")):
+                print("Error: Score must be in format '(X-Y)'")
+                continue
+                
+            score = score[1:-1]  # Remove parentheses
+            if not validate_score(score):
+                print("Error: Invalid score format. Use X-Y where X and Y are non-negative numbers")
+                continue
+                
+            nd_row.append(f"{game_type} ({score})")
+        except ValueError as e:
+            print("Error: Invalid format. Use 'GameType (X-Y)' where X and Y are numbers")
+            continue
     
     print("\nAwards (press Enter to skip):")
-    mvp = input("MVP: ").strip()
-    nd_row.append(mvp if mvp else None)
+    print("Available players:", ", ".join(sorted(all_players)))
     
-    clown = input("Clown of the Match: ").strip()
-    nd_row.append(clown if clown else None)
+    # Get and validate MVP
+    while True:
+        mvp = input("MVP: ").strip()
+        if not mvp:
+            nd_row.append(None)
+            break
+        if mvp in all_players:
+            nd_row.append(mvp)
+            break
+        print("Error: MVP must be a player from today's teams")
+        print("Available players:", ", ".join(sorted(all_players)))
     
-    # Show confirmation
+    # Get and validate Clown
+    while True:
+        clown = input("Clown of the Match: ").strip()
+        if not clown:
+            nd_row.append(None)
+            break
+        if clown in all_players:
+            nd_row.append(clown)
+            break
+        print("Error: Clown must be a player from today's teams")
+        print("Available players:", ", ".join(sorted(all_players)))
+    
     print("\nNew day summary:")
     print("---------------")
     print(f"Date: {nd_row[0]}")
     print(f"Team 1: {nd_row[1]}")
     print(f"Team 2: {nd_row[2]}")
     print(f"Score: {nd_row[3]}")
-    print(f"Games: {nd_row[4:11]}")
-    print(f"MVP: {nd_row[11]}")
-    print(f"Clown: {nd_row[12]}")
+    print("Games:")
+    for game in nd_row[4:11]:
+        if game:
+            print(f"  {game}")
+    print(f"MVP: {nd_row[11] or 'None'}")
+    print(f"Clown: {nd_row[12] or 'None'}")
     
     confirm = input("\nConfirm new day? (y/n): ").strip().lower()
     if confirm in ['', 'y', 'yes']:
