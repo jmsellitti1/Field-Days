@@ -88,9 +88,6 @@ class GameStats:
 class Player:
     """Represents a player and their statistics.
     
-    This class maintains all statistics for a single player, including their
-    performance in different game types, MVP/clown counts, and teammate history.
-    
     Attributes:
         name (str): The player's name.
         stats (Dict[str, GameStats]): Statistics for each game type.
@@ -101,9 +98,7 @@ class Player:
     name: str
     
     def __post_init__(self):
-        """Initialize player statistics after instance creation.
-        
-        Creates statistics tracking for all game types defined in CONFIG["GAME_TYPES"]
+        """Creates statistics tracking for all game types defined in CONFIG["GAME_TYPES"]
         and initializes teammate tracking for all known players.
         """
         # Initialize all stats to 0
@@ -117,18 +112,14 @@ class Player:
     
     @property
     def games_w(self) -> int:
-        """Total number of individual game wins (excluding Days).
-        
-        Returns:
+        """Returns:
             int: Sum of wins across all game types except Days.
         """
         return sum(self.stats[game].wins for game in ["pk", "cross", "ad", "pf", "ss", "fk"])
     
     @property
     def games_l(self) -> int:
-        """Total number of individual game losses (excluding Days).
-        
-        Returns:
+        """Returns:
             int: Sum of losses across all game types except Days.
         """
         return sum(self.stats[game].losses for game in ["pk", "cross", "ad", "pf", "ss", "fk"])
@@ -137,8 +128,6 @@ class Player:
 @dataclass
 class Game:
     """Represents a single game within a field day.
-    
-    Tracks the game type and score between two teams.
     
     Attributes:
         name (str): The type of game (e.g., "PK's", "Cross").
@@ -166,10 +155,8 @@ class Game:
 
 @dataclass
 class Day:
-    """Represents a complete field day session.
-    
-    Tracks teams, overall score, and individual games played during the session.
-    
+    """Represents a complete field day.
+        
     Attributes:
         team1 (List[Player]): Players on team 1.
         team2 (List[Player]): Players on team 2.
@@ -201,9 +188,7 @@ class Day:
 # HELPER FUNCTIONS
 
 def get_player(name: str) -> Player:
-    """Get or create a player by name.
-    
-    Looks up a player by name in the global players list. If the player
+    """Looks up a player by name in the global players list. If the player
     doesn't exist, creates a new Player instance and adds it to the list.
     
     Args:
@@ -227,9 +212,7 @@ def get_player(name: str) -> Player:
 
 def init_team(player_names: List[str]) -> List[Player]:
     """Initialize a team from a list of player names.
-    
-    Creates or retrieves Player instances for each name in the list.
-    
+        
     Args:
         player_names (List[str]): List of player names to initialize.
     
@@ -245,9 +228,7 @@ def init_team(player_names: List[str]) -> List[Player]:
 
 
 def add_win(game: str, team: List[Player], amt: int = 1) -> None:
-    """Add wins to all players on a team for a given game.
-    
-    Updates the win statistics for each player on the team for the specified game type.
+    """Updates the win statistics for each player on the team for the specified game type.
     
     Args:
         game (str): The game type (must be a key in CONFIG["GAME_TYPES"]).
@@ -268,9 +249,7 @@ def add_win(game: str, team: List[Player], amt: int = 1) -> None:
 
 
 def add_loss(game: str, team: List[Player], amt: int = 1) -> None:
-    """Add losses to all players on a team for a given game.
-    
-    Updates the loss statistics for each player on the team for the specified game type.
+    """Updates the loss statistics for each player on the team for the specified game type.
     
     Args:
         game (str): The game type (must be a key in CONFIG["GAME_TYPES"]).
@@ -309,9 +288,7 @@ def remove_player(rem_player: Player, player_list: List[Player]) -> List[Player]
 
 
 def update_team_lists(team: List[Player]) -> None:
-    """Update teammate frequency counts for all players on a team.
-    
-    For each player on the team, increments the count of times they've
+    """For each player on a team, increments the count of times they've
     played with every other player on the team.
     
     Args:
@@ -350,9 +327,7 @@ def update_stat(table: pd.DataFrame, player_num: int, wins: int, losses: int, re
 
 
 def get_new_day_input() -> List:
-    """Collect input for a new field day.
-    
-    Prompts the user for all necessary information about a new field day,
+    """Prompts the user for all necessary information about a new field day,
     including date, teams, scores, and awards.
     
     Returns:
@@ -364,27 +339,22 @@ def get_new_day_input() -> List:
     print("\nEntering new field day data:")
     print("----------------------------")
     
-    # Get basic day information
     nd_date = input("Date (MM/DD/YY): ").strip()
     nd_team1 = input("Team 1 Players (comma-separated): ").strip()
     nd_team2 = input("Team 2 Players (comma-separated): ").strip()
     nd_score = input("Score (X-Y): ").strip()
     
-    # Initialize row with basic info
     nd_row = [nd_date, nd_team1, nd_team2, nd_score]
     
-    # Get game results
     print("\nEnter game results (press Enter with no input when done):")
     while True:
         nd_game = input("Next Game (format: 'GameType (X-Y)'): ").strip()
         if not nd_game:
-            # Fill remaining game columns with None
             while len(nd_row) < 11:
                 nd_row.append(None)
             break
         nd_row.append(nd_game)
     
-    # Get awards
     print("\nAwards (press Enter to skip):")
     mvp = input("MVP: ").strip()
     nd_row.append(mvp if mvp else None)
@@ -423,7 +393,6 @@ def read_excel(filename: str, season: int = None, new_day: bool = False) -> List
         FileNotFoundError: If Excel file doesn't exist.
         ValueError: If Excel data is malformed or invalid.
     """
-    # Reset player stats for each season
     global players, player_names
     players = [Player(name) for name in player_names]
     days = []
@@ -512,10 +481,6 @@ def parse_days(days_list: List[Day]) -> None:
 
 def update_excel(filename: str, season: Optional[int] = None) -> None:
     """Update Excel spreadsheet with current player statistics.
-    
-    Writes current player statistics to either the main Stats sheet or a
-    season-specific sheet. Also updates the Teams sheet with teammate
-    frequencies when writing to the main Stats sheet.
     
     Args:
         filename (str): Path to the Excel file.
