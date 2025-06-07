@@ -1,11 +1,19 @@
 **/.DS_Store
-~$*.xlsx
+
+# Excel file
+**/Field_Days.xlsx
+
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
 .Python
 env/
 venv/
 .env
 *.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
