@@ -50,6 +50,27 @@
             color: white;
         }
 
+        /* Season Dropdown Styles */
+        .season-select {
+            margin: 20px 0;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .season-select:hover {
+            border-color: #4CAF50;
+        }
+
+        .season-select:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+
         /* Calendar Styles */
         .calendar {
             display: grid;
@@ -166,13 +187,18 @@
                 <button onclick="showSection('gamestats')">Game Stats</button>
                 <button onclick="showSection('teams')">Team Combinations</button>
                 <button onclick="showSection('days')">Game History</button>
-                <button onclick="showSection('calendar')">Calendar</button>
             </nav>
         </header>
 
         <main>
             <section id="stats" class="active">
                 <h2>Player Statistics</h2>
+                <select id="playerStatsSeasonSelect" class="season-select" onchange="updatePlayerStats()">
+                    <option value="total">Total Stats</option>
+                    {% for year in season_stats.keys()|sort if year != 'total' %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -185,7 +211,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for player in stats %}
+                            {% for player in season_stats['total'] %}
                             <tr>
                                 <td>{{ player.Name }}</td>
                                 <td>{{ player['Days Record'] }} ({{ "%.1f"|format(player['Days Pct'] * 100) }}%)</td>
@@ -307,6 +333,12 @@
 
             <section id="gamestats">
                 <h2>Game Statistics</h2>
+                <select id="gameStatsSeasonSelect" class="season-select" onchange="updateGameStats()">
+                    <option value="total">Total Stats</option>
+                    {% for year in season_stats.keys()|sort if year != 'total' %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
                 <div class="game-buttons">
                     {% set games = [] %}
                     {% for day in days %}
@@ -336,31 +368,6 @@
                         </tbody>
                     </table>
                 </div>
-            </section>
-
-            <section id="calendar">
-                <h2>Game Calendar</h2>
-                <div class="calendar-header">
-                    <div class="calendar-nav">
-                        <button onclick="previousMonth()">&lt;</button>
-                        <h3 id="currentMonthYear"></h3>
-                        <button onclick="nextMonth()">&gt;</button>
-                    </div>
-                </div>
-                <div class="calendar">
-                    <div class="weekday-header">Sun</div>
-                    <div class="weekday-header">Mon</div>
-                    <div class="weekday-header">Tue</div>
-                    <div class="weekday-header">Wed</div>
-                    <div class="weekday-header">Thu</div>
-                    <div class="weekday-header">Fri</div>
-                    <div class="weekday-header">Sat</div>
-                </div>
-                <div id="gamePopup" class="game-popup">
-                    <button class="close-popup" onclick="closePopup()">×</button>
-                    <div id="popupContent"></div>
-                </div>
-                <div id="gamePopupOverlay" class="game-popup-overlay" onclick="closePopup()"></div>
             </section>
         </main>
     </div>
@@ -456,14 +463,17 @@
             rows.forEach(row => tbody.appendChild(row));
         }
 
-        // Store game statistics for each player
-        let gameStats = {};
+        let currentGameSortColumn = -1;
+        let currentGameSortDirection = 'desc';
+        let originalGameStats = {};
+        let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
 
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize game statistics
             const rows = document.querySelectorAll('#days tbody .day-row');
             rows.forEach(row => {
-                const date = row.cells[1].textContent;
+                const dateStr = row.cells[1].textContent;
+                const year = new Date(dateStr).getFullYear();
                 const team1 = row.cells[2].textContent.split(', ');
                 const team2 = row.cells[3].textContent.split(', ');
                 const gamesRow = row.nextElementSibling;
@@ -477,9 +487,19 @@
                         
                         // Initialize player stats if needed
                         [...team1, ...team2].forEach(player => {
-                            if (!gameStats[gameName]) gameStats[gameName] = {};
-                            if (!gameStats[gameName][player]) {
-                                gameStats[gameName][player] = {
+                            if (!originalGameStats[gameName]) originalGameStats[gameName] = {};
+                            if (!originalGameStats[gameName][player]) {
+                                originalGameStats[gameName][player] = {};
+                            }
+                            if (!originalGameStats[gameName][player][year]) {
+                                originalGameStats[gameName][player][year] = {
+                                    wins: 0,
+                                    losses: 0,
+                                    name: player
+                                };
+                            }
+                            if (!originalGameStats[gameName][player]['total']) {
+                                originalGameStats[gameName][player]['total'] = {
                                     wins: 0,
                                     losses: 0,
                                     name: player
@@ -490,24 +510,31 @@
                         // Update stats based on game result
                         if (score1 > score2) {
                             team1.forEach(player => {
-                                gameStats[gameName][player].wins += score1;
-                                gameStats[gameName][player].losses += score2;
+                                originalGameStats[gameName][player][year].wins += score1;
+                                originalGameStats[gameName][player][year].losses += score2;
+                                originalGameStats[gameName][player]['total'].wins += score1;
+                                originalGameStats[gameName][player]['total'].losses += score2;
                             });
                             team2.forEach(player => {
-                                gameStats[gameName][player].wins += score2;
-                                gameStats[gameName][player].losses += score1;
+                                originalGameStats[gameName][player][year].wins += score2;
+                                originalGameStats[gameName][player][year].losses += score1;
+                                originalGameStats[gameName][player]['total'].wins += score2;
+                                originalGameStats[gameName][player]['total'].losses += score1;
                             });
                         } else if (score2 > score1) {
                             team2.forEach(player => {
-                                gameStats[gameName][player].wins += score2;
-                                gameStats[gameName][player].losses += score1;
+                                originalGameStats[gameName][player][year].wins += score2;
+                                originalGameStats[gameName][player][year].losses += score1;
+                                originalGameStats[gameName][player]['total'].wins += score2;
+                                originalGameStats[gameName][player]['total'].losses += score1;
                             });
                             team1.forEach(player => {
-                                gameStats[gameName][player].wins += score1;
-                                gameStats[gameName][player].losses += score2;
+                                originalGameStats[gameName][player][year].wins += score1;
+                                originalGameStats[gameName][player][year].losses += score2;
+                                originalGameStats[gameName][player]['total'].wins += score1;
+                                originalGameStats[gameName][player]['total'].losses += score2;
                             });
                         }
-                        // If scores are equal, no stats are updated (no ties counted)
                     });
                 }
             });
@@ -517,26 +544,57 @@
             if (firstGameButton) {
                 showGameStats(firstGameButton.dataset.game);
             }
-
-            // Initialize calendar
-            initializeCalendar();
         });
 
+        function updatePlayerStats() {
+            const season = document.getElementById('playerStatsSeasonSelect').value;
+            const tbody = document.querySelector('#stats tbody');
+            tbody.innerHTML = '';
+
+            // Get stats for the selected season (including total)
+            const statsToShow = seasonStats[season] || [];
+
+            // Display the stats
+            statsToShow.forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${player.Name}</td>
+                    <td>${player['Days Record']} (${(player['Days Pct'] * 100).toFixed(1)}%)</td>
+                    <td>${player['Games Record']} (${(player['Games Pct'] * 100).toFixed(1)}%)</td>
+                    <td>${player.MVP}</td>
+                    <td>${player.Clown}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
         function showGameStats(gameName) {
+            const season = document.getElementById('gameStatsSeasonSelect').value;
+            
             // Update active button
             document.querySelectorAll('.game-button').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.game === gameName);
             });
 
-            // Get stats for selected game
-            const gameData = gameStats[gameName];
+            // Get stats for selected game and season
+            const gameData = originalGameStats[gameName];
             const tbody = document.getElementById('gameStatsBody');
             tbody.innerHTML = '';
 
-            // Convert object to array for sorting
-            const players = Object.values(gameData);
+            if (!gameData) return;
 
-            // Sort by win percentage initially
+            // Convert object to array for sorting
+            const players = Object.entries(gameData)
+                .map(([playerName, seasonData]) => {
+                    const stats = season === 'total' ? seasonData['total'] : seasonData[parseInt(season)];
+                    return stats ? {
+                        name: playerName,
+                        ...stats
+                    } : null;
+                })
+                .filter(player => player && (player.wins > 0 || player.losses > 0));
+
+            // Sort by win percentage
             players.sort((a, b) => {
                 const aPct = a.wins / (a.wins + a.losses);
                 const bPct = b.wins / (b.wins + b.losses);
@@ -556,8 +614,12 @@
             });
         }
 
-        let currentGameSortColumn = -1;
-        let currentGameSortDirection = 'desc';
+        function updateGameStats() {
+            const activeGameButton = document.querySelector('.game-button.active');
+            if (activeGameButton) {
+                showGameStats(activeGameButton.dataset.game);
+            }
+        }
 
         function sortGameTable(columnIndex, sortType) {
             const tbody = document.getElementById('gameStatsBody');
@@ -600,143 +662,6 @@
 
             // Reorder the table
             rows.forEach(row => tbody.appendChild(row));
-        }
-
-        // Calendar functionality
-        let currentDate = new Date();
-        let gameDates = {};
-
-        function initializeCalendar() {
-            // Parse game dates from the days table
-            const rows = document.querySelectorAll('#days tbody .day-row');
-            rows.forEach(row => {
-                const dateStr = row.cells[1].textContent;
-                const date = new Date(dateStr);
-                const dateKey = date.toISOString().split('T')[0];
-                
-                gameDates[dateKey] = {
-                    team1: row.cells[2].textContent,
-                    team2: row.cells[3].textContent,
-                    score: row.cells[4].textContent,
-                    mvp: row.cells[5].textContent,
-                    clown: row.cells[6].textContent,
-                    games: []
-                };
-
-                // Get games details
-                const gamesRow = row.nextElementSibling;
-                if (gamesRow && gamesRow.classList.contains('games-details')) {
-                    const gameItems = gamesRow.querySelectorAll('.game-item');
-                    gameItems.forEach(game => {
-                        gameDates[dateKey].games.push({
-                            name: game.querySelector('.game-name').textContent,
-                            score: game.querySelector('.game-score').textContent
-                        });
-                    });
-                }
-            });
-
-            renderCalendar();
-        }
-
-        function renderCalendar() {
-            const year = currentDate.getFullYear();
-            const month = currentDate.getMonth();
-            
-            // Update header
-            document.getElementById('currentMonthYear').textContent = 
-                new Date(year, month).toLocaleString('default', { month: 'long', year: 'numeric' });
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startingDay = firstDay.getDay();
-            const totalDays = lastDay.getDate();
-
-            const calendar = document.querySelector('.calendar');
-            // Clear existing days after headers
-            while (calendar.children.length > 7) {
-                calendar.removeChild(calendar.lastChild);
-            }
-
-            // Add days from previous month
-            const prevMonthLastDay = new Date(year, month, 0).getDate();
-            for (let i = startingDay - 1; i >= 0; i--) {
-                const dayDiv = createDayElement(prevMonthLastDay - i, true);
-                calendar.appendChild(dayDiv);
-            }
-
-            // Add days of current month
-            for (let day = 1; day <= totalDays; day++) {
-                const date = new Date(year, month, day);
-                const dateKey = date.toISOString().split('T')[0];
-                const dayDiv = createDayElement(day, false, gameDates[dateKey]);
-                
-                // Add today class if it's today
-                const today = new Date();
-                if (date.toDateString() === today.toDateString()) {
-                    dayDiv.classList.add('today');
-                }
-                
-                calendar.appendChild(dayDiv);
-            }
-
-            // Add days from next month
-            const remainingSlots = 42 - (startingDay + totalDays); // 42 = 6 rows × 7 days
-            for (let day = 1; day <= remainingSlots; day++) {
-                const dayDiv = createDayElement(day, true);
-                calendar.appendChild(dayDiv);
-            }
-        }
-
-        function createDayElement(day, isOtherMonth, gameData = null) {
-            const dayDiv = document.createElement('div');
-            dayDiv.className = 'calendar-day' + (isOtherMonth ? ' other-month' : '');
-            dayDiv.textContent = day;
-
-            if (gameData) {
-                dayDiv.classList.add('has-games');
-                dayDiv.onclick = () => showGameDetails(gameData);
-            }
-
-            return dayDiv;
-        }
-
-        function showGameDetails(gameData) {
-            const popup = document.getElementById('gamePopup');
-            const overlay = document.getElementById('gamePopupOverlay');
-            const content = document.getElementById('popupContent');
-
-            content.innerHTML = `
-                <h3>Game Details</h3>
-                <p><strong>Teams:</strong> ${gameData.team1} vs ${gameData.team2}</p>
-                <p><strong>Score:</strong> ${gameData.score}</p>
-                <p><strong>MVP:</strong> ${gameData.mvp}</p>
-                <p><strong>Clown:</strong> ${gameData.clown}</p>
-                <h4>Games:</h4>
-                <ul>
-                    ${gameData.games.map(game => `
-                        <li>${game.name}: ${game.score}</li>
-                    `).join('')}
-                </ul>
-            `;
-
-            popup.style.display = 'block';
-            overlay.style.display = 'block';
-        }
-
-        function closePopup() {
-            document.getElementById('gamePopup').style.display = 'none';
-            document.getElementById('gamePopupOverlay').style.display = 'none';
-        }
-
-        function previousMonth() {
-            currentDate.setMonth(currentDate.getMonth() - 1);
-            renderCalendar();
-        }
-
-        function nextMonth() {
-            currentDate.setMonth(currentDate.getMonth() + 1);
-            renderCalendar();
         }
     </script>
 </body>
