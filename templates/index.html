@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
+
+
         .sortable {
             cursor: pointer;
             position: relative;
@@ -28,8 +30,10 @@
             margin: 20px 0;
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             justify-content: center;
+            overflow-x: auto;
+            padding-bottom: 5px;
         }
 
         .game-button {
@@ -181,6 +185,7 @@
 <body>
     <div class="container">
         <header>
+            <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle dark mode">🌙</button>
             <h1>Field Days Statistics</h1>
             <nav>
                 <button onclick="showSection('stats')" class="active">Player Stats</button>
@@ -192,13 +197,15 @@
 
         <main>
             <section id="stats" class="active">
-                <h2>Player Statistics</h2>
-                <select id="playerStatsSeasonSelect" class="season-select" onchange="updatePlayerStats()">
-                    <option value="total">Total Stats</option>
-                    {% for year in season_stats.keys()|sort if year != 'total' %}
-                        <option value="{{ year }}">{{ year }}</option>
-                    {% endfor %}
-                </select>
+                <div class="section-header">
+                    <h2>Player Statistics</h2>
+                    <select id="playerStatsSeasonSelect" class="season-select" onchange="updatePlayerStats()">
+                        <option value="total">Total Stats</option>
+                        {% for year in season_stats.keys()|sort if year != 'total' %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead>
@@ -303,7 +310,7 @@
                                 <td>{{ day['Team 2'] }}</td>
                                 <td>{{ day.Score }}</td>
                                 <td>{{ day.MVP }}</td>
-                                <td>{{ day['Clown of the Match'] }}</td>
+                                <td>{% if day['Clown of the Match'] and day['Clown of the Match']|string != 'nan' %}{{ day['Clown of the Match'] }}{% endif %}</td>
                             </tr>
                             <tr class="games-details" id="games-{{loop.index}}" style="display: none;">
                                 <td colspan="7">
@@ -332,13 +339,15 @@
             </section>
 
             <section id="gamestats">
-                <h2>Game Statistics</h2>
-                <select id="gameStatsSeasonSelect" class="season-select" onchange="updateGameStats()">
-                    <option value="total">Total Stats</option>
-                    {% for year in season_stats.keys()|sort if year != 'total' %}
-                        <option value="{{ year }}">{{ year }}</option>
-                    {% endfor %}
-                </select>
+                <div class="section-header">
+                    <h2>Game Statistics</h2>
+                    <select id="gameStatsSeasonSelect" class="season-select" onchange="updateGameStats()">
+                        <option value="total">Total Stats</option>
+                        {% for year in season_stats.keys()|sort if year != 'total' %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="game-buttons">
                     {% set games = [] %}
                     {% for day in days %}
@@ -469,7 +478,6 @@
         let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize game statistics
             const rows = document.querySelectorAll('#days tbody .day-row');
             rows.forEach(row => {
                 const dateStr = row.cells[1].textContent;
@@ -485,7 +493,6 @@
                         const gameScore = gameItem.querySelector('.game-score').textContent;
                         const [score1, score2] = gameScore.split('-').map(s => parseInt(s));
                         
-                        // Initialize player stats if needed
                         [...team1, ...team2].forEach(player => {
                             if (!originalGameStats[gameName]) originalGameStats[gameName] = {};
                             if (!originalGameStats[gameName][player]) {
@@ -507,7 +514,6 @@
                             }
                         });
 
-                        // Update stats based on game result
                         if (score1 > score2) {
                             team1.forEach(player => {
                                 originalGameStats[gameName][player][year].wins += score1;
@@ -539,11 +545,32 @@
                 }
             });
 
-            // Show stats for first game by default
             const firstGameButton = document.querySelector('.game-button');
             if (firstGameButton) {
                 showGameStats(firstGameButton.dataset.game);
             }
+
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            
+            if (!darkModeToggle) {
+                return;
+            }
+            
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                darkModeToggle.textContent = '☀️';
+            }
+
+            darkModeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                const isDark = body.classList.contains('dark-mode');
+                darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+                localStorage.setItem('darkMode', isDark);
+            });
+            
         });
 
         function updatePlayerStats() {
@@ -576,7 +603,6 @@
                 btn.classList.toggle('active', btn.dataset.game === gameName);
             });
 
-            // Get stats for selected game and season
             const gameData = originalGameStats[gameName];
             const tbody = document.getElementById('gameStatsBody');
             tbody.innerHTML = '';
@@ -663,6 +689,8 @@
             // Reorder the table
             rows.forEach(row => tbody.appendChild(row));
         }
+
+
     </script>
 </body>
 </html> 

@@ -22,7 +22,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 0 2rem 2rem 2rem;
 }
 
 header {
@@ -33,13 +33,30 @@ header {
 h1 {
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
+    margin-right: 80px;
     color: var(--primary-color);
 }
 
 h2 {
     font-size: 1.8rem;
+    margin-top: 1.5rem;
     margin-bottom: 1rem;
     color: var(--text-color);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+#gamestats .section-header {
+    margin-bottom: 0.5rem;
+}
+
+.section-header h2 {
+    margin: 0;
 }
 
 nav {
@@ -47,6 +64,7 @@ nav {
     justify-content: center;
     gap: 1rem;
     margin-bottom: 2rem;
+    margin-right: 80px;
 }
 
 button {
@@ -145,7 +163,6 @@ tr:hover td {
     }
 }
 
-/* Game History Styles */
 .expand-btn {
     padding: 0.25rem;
     width: 24px;
@@ -170,7 +187,6 @@ tr:hover td {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-    transform: rotate(90deg);
 }
 
 .games-details {
@@ -187,21 +203,20 @@ tr:hover td {
 }
 
 .games-list {
-    padding: 0.75rem 2rem;
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
 }
 
 .game-item {
     display: flex;
+    gap: 6px;
     align-items: center;
-    gap: 0.5rem;
-    background: white;
-    padding: 0.5rem 0.75rem;
-    border-radius: 0.25rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    width: fit-content;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: #f5f5f5;
+    margin-bottom: 0;
 }
 
 .game-name {
@@ -212,13 +227,12 @@ tr:hover td {
 
 .game-score {
     font-family: monospace;
-    background: var(--background-color);
+    background: #ffffff;
     padding: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     font-size: 0.9rem;
 }
 
-/* Update existing styles */
 .day-row:hover td {
     background-color: var(--background-color);
 }
@@ -231,7 +245,6 @@ tr:hover td {
     color: var(--primary-color);
 }
 
-/* Team Combinations Table Styles */
 .team-combinations {
     border-collapse: collapse;
     width: 100%;
@@ -267,7 +280,6 @@ tr:hover td {
     background-color: #f5f5f5;
 }
 
-/* Responsive table styles */
 @media (max-width: 768px) {
     .team-combinations {
         font-size: 0.9rem;
@@ -277,4 +289,210 @@ tr:hover td {
     .team-combinations td {
         padding: 0.5rem;
     }
-} 
+
+    header h1 {
+        margin-right: 60px;
+    }
+    
+    header nav {
+        margin-right: 60px;
+    }
+
+    .dark-mode-toggle {
+        top: 15px;
+        right: 15px;
+        font-size: 18px;
+        width: 36px;
+        height: 36px;
+        padding: 0;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        margin-right: 50px;
+    }
+    
+    header nav {
+        margin-right: 50px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .dark-mode-toggle {
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
+
+body.dark-mode {
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --background-color: #181a1b;
+    --text-color: #f8fafc;
+    --border-color: #334155;
+}
+
+body.dark-mode .container,
+body.dark-mode .table-container,
+body.dark-mode .games-details td,
+body.dark-mode .game-popup {
+    background-color: #23272a;
+    color: var(--text-color);
+}
+
+body.dark-mode th,
+body.dark-mode .team-combinations th,
+body.dark-mode .team-combinations .corner-header,
+body.dark-mode .team-combinations .player-header {
+    background-color: #1e2225;
+    color: var(--text-color);
+}
+
+body.dark-mode tr:hover td,
+body.dark-mode .team-combinations .combination-cell:hover {
+    background-color: #23272a;
+}
+
+body.dark-mode button,
+body.dark-mode .expand-btn {
+    background-color: #23272a;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+body.dark-mode button:hover,
+body.dark-mode .expand-btn:hover {
+    background-color: #181a1b;
+    color: var(--primary-color);
+}
+
+body.dark-mode button.active,
+body.dark-mode .expand-btn.expanded {
+    background-color: var(--primary-color);
+    color: #181a1b;
+    border-color: var(--primary-color);
+}
+
+body.dark-mode .game-item {
+    background: #1e2225;
+    color: var(--text-color);
+}
+
+body.dark-mode .game-score {
+    background: #23272a;
+    color: var(--text-color);
+}
+
+body.dark-mode .team-combinations .same-player {
+    background-color: #23272a;
+}
+
+body.dark-mode .calendar-day {
+    background-color: #23272a;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+body.dark-mode .calendar-day.has-games {
+    background-color: #1e293b;
+}
+body.dark-mode .calendar-day.has-games:hover {
+    background-color: #334155;
+}
+body.dark-mode .calendar-day.today {
+    border: 2px solid var(--primary-color);
+}
+body.dark-mode .calendar-day.other-month {
+    background-color: #181a1b;
+    color: #64748b;
+}
+body.dark-mode .weekday-header {
+    color: var(--text-color);
+}
+
+.dark-mode-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--border-color);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    color: var(--text-color);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark-mode-toggle:hover {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .dark-mode-toggle {
+    background: rgba(35, 39, 42, 0.9);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background-color: var(--primary-color);
+    color: #181a1b;
+    border-color: var(--primary-color);
+}
+
+header {
+    position: relative;
+    background-color: var(--background-color);
+    margin: 0 -2rem;
+    padding: 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .game-popup {
+    background: #23272a;
+    color: var(--text-color);
+}
+
+body.dark-mode .season-select {
+    background-color: #23272a;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+body.dark-mode .season-select:hover,
+body.dark-mode .season-select:focus {
+    border-color: var(--primary-color);
+}
+
+body.dark-mode header {
+    background-color: var(--background-color);
+    border-bottom-color: var(--border-color);
+}

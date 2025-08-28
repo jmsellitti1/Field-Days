@@ -46,10 +46,24 @@ def index():
         # Convert datetime to string for JSON serialization
         day['Date'] = day['Date'].strftime('%m/%d/%Y')
     
+    cleaned_season_stats = {}
+    for year, data in season_stats.items():
+        records = data.to_dict('records')
+        cleaned_records = []
+        for record in records:
+            cleaned_record = {}
+            for key, value in record.items():
+                if pd.isna(value):
+                    cleaned_record[key] = None
+                else:
+                    cleaned_record[key] = value
+            cleaned_records.append(cleaned_record)
+        cleaned_season_stats[year] = cleaned_records
+    
     return render_template('index.html', 
                          teams=teams_data,
                          days=days_data,
-                         season_stats={year: data.to_dict('records') for year, data in season_stats.items()})
+                         season_stats=cleaned_season_stats)
 
 @app.route('/health')
 def health_check():
