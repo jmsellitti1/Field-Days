@@ -105,6 +105,16 @@ section.active {
     overflow-x: auto;
 }
 
+.chart-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    height: 500px;
+    position: relative;
+    min-height: 400px;
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -160,6 +170,12 @@ tr:hover td {
 
     th, td {
         padding: 0.75rem;
+    }
+    
+    .chart-container {
+        height: 350px;
+        min-height: 300px;
+        padding: 15px;
     }
 }
 
@@ -340,6 +356,12 @@ tr:hover td {
         align-items: flex-start;
         gap: 0.75rem;
     }
+    
+    .chart-container {
+        height: 300px;
+        min-height: 250px;
+        padding: 10px;
+    }
 }
 
 body.dark-mode {
@@ -352,6 +374,7 @@ body.dark-mode {
 
 body.dark-mode .container,
 body.dark-mode .table-container,
+body.dark-mode .chart-container,
 body.dark-mode .games-details td,
 body.dark-mode .game-popup {
     background-color: #23272a;

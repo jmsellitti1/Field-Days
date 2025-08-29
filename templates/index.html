@@ -6,6 +6,7 @@
     <title>Field Days Statistics</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
 
 
@@ -54,7 +55,6 @@
             color: white;
         }
 
-        /* Season Dropdown Styles */
         .season-select {
             margin: 20px 0;
             padding: 8px;
@@ -365,17 +365,8 @@
                         <button data-game="{{ game }}" onclick="showGameStats(this.dataset.game)" class="game-button{% if loop.first %} active{% endif %}">{{ game }}</button>
                     {% endfor %}
                 </div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="sortGameTable(0, 'text')">Name</th>
-                                <th class="sortable" onclick="sortGameTable(1, 'percent')">Record (Win %)</th>
-                            </tr>
-                        </thead>
-                        <tbody id="gameStatsBody">
-                        </tbody>
-                    </table>
+                <div class="chart-container">
+                    <canvas id="gameStatsChart"></canvas>
                 </div>
             </section>
         </main>
@@ -431,7 +422,6 @@
             const rows = Array.from(tbody.querySelectorAll('tr'));
             const headers = table.querySelectorAll('th');
 
-            // Update sort direction
             if (currentSortColumn === columnIndex) {
                 currentSortDirection = currentSortDirection === 'desc' ? 'asc' : 'desc';
             } else {
@@ -439,17 +429,14 @@
             }
             currentSortColumn = columnIndex;
 
-            // Update header classes
             headers.forEach(header => header.classList.remove('asc', 'desc'));
             headers[columnIndex].classList.add(currentSortDirection);
 
-            // Sort the rows
             rows.sort((a, b) => {
                 let aValue = a.cells[columnIndex].textContent;
                 let bValue = b.cells[columnIndex].textContent;
 
                 if (sortType === 'percent') {
-                    // Extract percentage from format like "5-2 (71.4%)"
                     aValue = parseFloat(aValue.match(/\(([\d.]+)%\)/)[1]);
                     bValue = parseFloat(bValue.match(/\(([\d.]+)%\)/)[1]);
                 } else if (sortType === 'number') {
@@ -468,14 +455,12 @@
                 }
             });
 
-            // Reorder the table
             rows.forEach(row => tbody.appendChild(row));
         }
 
-        let currentGameSortColumn = -1;
-        let currentGameSortDirection = 'desc';
         let originalGameStats = {};
         let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
+        let gameStatsChart = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#days tbody .day-row');
@@ -569,6 +554,13 @@
                 const isDark = body.classList.contains('dark-mode');
                 darkModeToggle.textContent = isDark ? '☀️' : '🌙';
                 localStorage.setItem('darkMode', isDark);
+                
+                if (gameStatsChart) {
+                    const activeGameButton = document.querySelector('.game-button.active');
+                    if (activeGameButton) {
+                        showGameStats(activeGameButton.dataset.game);
+                    }
+                }
             });
             
         });
@@ -578,10 +570,8 @@
             const tbody = document.querySelector('#stats tbody');
             tbody.innerHTML = '';
 
-            // Get stats for the selected season (including total)
             const statsToShow = seasonStats[season] || [];
 
-            // Display the stats
             statsToShow.forEach(player => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -597,19 +587,17 @@
 
         function showGameStats(gameName) {
             const season = document.getElementById('gameStatsSeasonSelect').value;
-            
-            // Update active button
+
             document.querySelectorAll('.game-button').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.game === gameName);
             });
 
             const gameData = originalGameStats[gameName];
-            const tbody = document.getElementById('gameStatsBody');
-            tbody.innerHTML = '';
+            if (!gameData) {
+                showNoDataMessage();
+                return;
+            }
 
-            if (!gameData) return;
-
-            // Convert object to array for sorting
             const players = Object.entries(gameData)
                 .map(([playerName, seasonData]) => {
                     const stats = season === 'total' ? seasonData['total'] : seasonData[parseInt(season)];
@@ -620,24 +608,29 @@
                 })
                 .filter(player => player && (player.wins > 0 || player.losses > 0));
 
-            // Sort by win percentage
+            if (players.length === 0) {
+                showNoDataMessage();
+                return;
+            }
+
             players.sort((a, b) => {
                 const aPct = a.wins / (a.wins + a.losses);
                 const bPct = b.wins / (b.wins + b.losses);
                 return bPct - aPct;
             });
 
-            // Populate table
-            players.forEach(player => {
+            const labels = players.map(player => player.name);
+            const data = players.map(player => {
+                const total = player.wins + player.losses;
+                return total > 0 ? (player.wins / total * 100) : 0;
+            });
+            const recordLabels = players.map(player => {
                 const total = player.wins + player.losses;
                 const winPct = total > 0 ? (player.wins / total * 100) : 0;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${player.name}</td>
-                    <td>${player.wins}-${player.losses} (${winPct.toFixed(1)}%)</td>
-                `;
-                tbody.appendChild(row);
+                return `${player.wins}-${player.losses} (${winPct.toFixed(1)}%)`;
             });
+
+            createGameStatsChart(labels, data, recordLabels, gameName, season);
         }
 
         function updateGameStats() {
@@ -647,47 +640,185 @@
             }
         }
 
-        function sortGameTable(columnIndex, sortType) {
-            const tbody = document.getElementById('gameStatsBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const headers = tbody.parentElement.querySelectorAll('th');
-
-            // Update sort direction
-            if (currentGameSortColumn === columnIndex) {
-                currentGameSortDirection = currentGameSortDirection === 'desc' ? 'asc' : 'desc';
-            } else {
-                currentGameSortDirection = columnIndex === 0 ? 'asc' : 'desc';
+        function showNoDataMessage() {
+            const canvas = document.getElementById('gameStatsChart');
+            const ctx = canvas.getContext('2d');
+            
+            if (gameStatsChart) {
+                gameStatsChart.destroy();
+                gameStatsChart = null;
             }
-            currentGameSortColumn = columnIndex;
-
-            // Update header classes
-            headers.forEach(header => header.classList.remove('asc', 'desc'));
-            headers[columnIndex].classList.add(currentGameSortDirection);
-
-            // Sort the rows
-            rows.sort((a, b) => {
-                let aValue = a.cells[columnIndex].textContent;
-                let bValue = b.cells[columnIndex].textContent;
-
-                if (sortType === 'percent') {
-                    // Extract percentage from format like "5-2 (71.4%)"
-                    aValue = parseFloat(aValue.match(/\(([\d.]+)%\)/)[1]);
-                    bValue = parseFloat(bValue.match(/\(([\d.]+)%\)/)[1]);
-                }
-
-                if (sortType === 'text') {
-                    return currentGameSortDirection === 'asc'
-                        ? aValue.localeCompare(bValue)
-                        : bValue.localeCompare(aValue);
+            
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '18px Inter, sans-serif';
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color');
+            
+            const message = 'No data available for this game/season combination';
+            const words = message.split(' ');
+            const lines = [];
+            let currentLine = '';
+            
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).length > 30) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
                 } else {
-                    return currentGameSortDirection === 'desc'
-                        ? bValue - aValue
-                        : aValue - bValue;
+                    currentLine += (currentLine ? ' ' : '') + word;
+                }
+            });
+            if (currentLine) {
+                lines.push(currentLine.trim());
+            }
+            
+            const lineHeight = 25;
+            const startY = canvas.height / 2 - (lines.length - 1) * lineHeight / 2;
+            
+            lines.forEach((line, index) => {
+                ctx.fillText(line, canvas.width / 2, startY + index * lineHeight);
+            });
+            
+            ctx.restore();
+        }
+
+        function createGameStatsChart(labels, data, recordLabels, gameName, season) {
+            const ctx = document.getElementById('gameStatsChart').getContext('2d');
+            
+            if (gameStatsChart) {
+                gameStatsChart.destroy();
+            }
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
+
+            gameStatsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Win Percentage',
+                        data: data,
+                        backgroundColor: isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(37, 99, 235, 0.8)',
+                        borderColor: isDarkMode ? 'rgba(96, 165, 250, 1)' : 'rgba(37, 99, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${gameName} - Win Percentages${season !== 'total' ? ' (' + season + ')' : ''}`,
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            },
+                            color: textColor
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? '#23272a' : 'white',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Win %: ${context.parsed.y.toFixed(1)}%`;
+                                },
+                                afterLabel: function(context) {
+                                    const fullLabel = recordLabels[context.dataIndex];
+                                    const recordPart = fullLabel.split(' (')[0];
+                                    return `Record: ${recordPart}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: textColor
+                            },
+                            grid: {
+                                color: borderColor
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: textColor
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            top: 20,
+                            bottom: 20
+                        }
+                    }
                 }
             });
 
-            // Reorder the table
-            rows.forEach(row => tbody.appendChild(row));
+            addBarLabels(ctx, data, recordLabels);
+            
+            const resizeObserver = new ResizeObserver(() => {
+                if (gameStatsChart) {
+                    addBarLabels(ctx, data, recordLabels);
+                }
+            });
+            resizeObserver.observe(document.getElementById('gameStatsChart'));
+        }
+
+        function addBarLabels(ctx, data, recordLabels) {
+            const chart = gameStatsChart;
+            const meta = chart.getDatasetMeta(0);
+            
+            recordLabels.forEach((label, index) => {
+                const bar = meta.data[index];
+                if (bar) {
+                    const x = bar.x;
+                    const y = bar.y - 10;
+                    
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.font = '12px Inter, sans-serif';
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color');
+                    
+                    const textMetrics = ctx.measureText(label);
+                    const padding = 4;
+                    const bgWidth = textMetrics.width + (padding * 2);
+                    const bgHeight = 16;
+                    
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--background-color');
+                    ctx.fillRect(x - bgWidth/2, y - bgHeight - 2, bgWidth, bgHeight);
+                    
+                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color');
+                    ctx.fillText(label, x, y);
+                    ctx.restore();
+                }
+            });
         }
 
 
