@@ -369,8 +369,11 @@
                         <button data-game="{{ game }}" onclick="showGameStats(this.dataset.game)" class="game-button{% if loop.first %} active{% endif %}">{{ game }}</button>
                     {% endfor %}
                 </div>
-                <div class="chart-container">
+                <div class="chart-container" style="height: 360px;">
                     <canvas id="gameStatsChart"></canvas>
+                </div>
+                <div class="chart-container" style="height: 360px; margin-top: 16px;">
+                    <canvas id="gameStatsScatter"></canvas>
                 </div>
             </section>
         </main>
@@ -465,6 +468,7 @@
         let originalGameStats = {};
         let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
         let gameStatsChart = null;
+        let gameStatsScatterChart = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#days tbody .day-row');
@@ -534,32 +538,27 @@
                 }
             });
 
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const body = document.body;
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+            if (isDarkMode) {
+                body.classList.add('dark-mode');
+                if (darkModeToggle) darkModeToggle.textContent = '☀️';
+            }
+
             const firstGameButton = document.querySelector('.game-button');
             if (firstGameButton) {
                 showGameStats(firstGameButton.dataset.game);
             }
 
-            const darkModeToggle = document.getElementById('darkModeToggle');
-            const body = document.body;
-            
-            if (!darkModeToggle) {
-                return;
-            }
-            
-            const isDarkMode = localStorage.getItem('darkMode') === 'true';
-
-            if (isDarkMode) {
-                body.classList.add('dark-mode');
-                darkModeToggle.textContent = '☀️';
-            }
-
-            darkModeToggle.addEventListener('click', () => {
+            if (darkModeToggle) darkModeToggle.addEventListener('click', () => {
                 body.classList.toggle('dark-mode');
                 const isDark = body.classList.contains('dark-mode');
                 darkModeToggle.textContent = isDark ? '☀️' : '🌙';
                 localStorage.setItem('darkMode', isDark);
                 
-                if (gameStatsChart) {
+                if (gameStatsChart || gameStatsScatterChart) {
                     const activeGameButton = document.querySelector('.game-button.active');
                     if (activeGameButton) {
                         showGameStats(activeGameButton.dataset.game);
@@ -599,6 +598,7 @@
             const gameData = originalGameStats[gameName];
             if (!gameData) {
                 showNoDataMessage();
+                clearScatter();
                 return;
             }
 
@@ -614,6 +614,7 @@
 
             if (players.length === 0) {
                 showNoDataMessage();
+                clearScatter();
                 return;
             }
 
@@ -634,7 +635,10 @@
                 return `${player.wins}-${player.losses} (${winPct.toFixed(1)}%)`;
             });
 
+            const gamesPlayed = players.map(player => player.wins + player.losses);
+
             createGameStatsChart(labels, data, recordLabels, gameName, season);
+            createGameStatsScatter(labels, gamesPlayed, data, recordLabels, gameName, season);
         }
 
         function updateGameStats() {
@@ -651,6 +655,10 @@
             if (gameStatsChart) {
                 gameStatsChart.destroy();
                 gameStatsChart = null;
+            }
+            if (gameStatsScatterChart) {
+                gameStatsScatterChart.destroy();
+                gameStatsScatterChart = null;
             }
             
             const container = canvas.parentElement;
@@ -823,6 +831,86 @@
                     ctx.restore();
                 }
             });
+        }
+
+        function createGameStatsScatter(labels, games, winPcts, recordLabels, gameName, season) {
+            const ctx = document.getElementById('gameStatsScatter').getContext('2d');
+
+            if (gameStatsScatterChart) {
+                gameStatsScatterChart.destroy();
+            }
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
+            const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.9)' : 'rgba(37, 99, 235, 0.9)';
+
+            const dataPoints = labels.map((name, i) => ({ x: games[i], y: winPcts[i], name, record: recordLabels[i] }));
+
+            gameStatsScatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Win % vs Games Played',
+                        data: dataPoints,
+                        backgroundColor: pointColor,
+                        borderColor: pointColor,
+                        pointRadius: 4,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${gameName} - Win % vs Games${season !== 'total' ? ' (' + season + ')' : ''}`,
+                            color: textColor,
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? '#23272a' : 'white',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                            callbacks: {
+                                label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(1)}%`,
+                                afterLabel: (ctx) => [`Games: ${ctx.raw.x}`, ctx.raw.record]
+                            }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Games Played', color: textColor },
+                            ticks: { color: textColor },
+                            grid: { color: borderColor }
+                        },
+                        y: {
+                            title: { display: true, text: 'Win %', color: textColor },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { callback: (v) => v + '%', color: textColor },
+                            grid: { color: borderColor }
+                        }
+                    }
+                }
+            });
+        }
+
+        function clearScatter() {
+            const canvas = document.getElementById('gameStatsScatter');
+            const ctx = canvas.getContext('2d');
+            if (gameStatsScatterChart) {
+                gameStatsScatterChart.destroy();
+                gameStatsScatterChart = null;
+            }
+            const container = canvas.parentElement;
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
         }
 
 
