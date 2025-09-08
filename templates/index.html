@@ -247,7 +247,7 @@
                                     {% endif %}
                                 {% endfor %}
                                 {% for player in players|sort %}
-                                    {% if player|string != "nan" and player|string != "NaN" %}
+                                    {% if player|string not in ["nan", "NaN"] %}
                                         <th class="player-header">{{ player }}</th>
                                     {% endif %}
                                 {% endfor %}
@@ -255,11 +255,11 @@
                         </thead>
                         <tbody>
                             {% for row_player in players|sort %}
-                                {% if row_player|string != "nan" and row_player|string != "NaN" %}
+                                {% if row_player|string not in ["nan", "NaN"] %}
                                 <tr>
                                     <td class="player-header">{{ row_player }}</td>
                                     {% for col_player in players|sort %}
-                                        {% if col_player|string != "nan" and col_player|string != "NaN" %}
+                                        {% if col_player|string not in ["nan", "NaN"] %}
                                         <td class="combination-cell {% if row_player == col_player %}same-player{% endif %}">
                                             {% if row_player == col_player %}
                                                 -
@@ -282,6 +282,9 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                </div>
+                <div class="team-combinations-caption">
+                    Frequency of players being on the same team (As a percentage of days that the player in the vertical list has played)
                 </div>
             </section>
 
@@ -825,4 +828,4 @@
 
     </script>
 </body>
-</html> 
+</html>

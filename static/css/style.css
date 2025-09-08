@@ -296,6 +296,24 @@ tr:hover td {
     background-color: #f5f5f5;
 }
 
+.team-combinations-caption {
+    margin-top: 1rem;
+    background: white;
+    color: var(--text-color);
+    border-radius: 0.5rem;
+    padding: 12px;
+    width: 100%;
+    font-size: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-mode .team-combinations-caption {
+    background: #23272a;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
 @media (max-width: 768px) {
     .team-combinations {
         font-size: 0.9rem;

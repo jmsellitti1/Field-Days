@@ -30,7 +30,7 @@ def index():
     teams, days, season_stats = load_data()
     teams_data = teams.to_dict('records')
     
-    days['Date'] = pd.to_datetime(days['Date'])
+    days['Date'] = pd.to_datetime(days['Date'], format='%m/%d/%y')
     
     days = days.sort_values('Date', ascending=False)
     
