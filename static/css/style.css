@@ -395,7 +395,7 @@ body.dark-mode .table-container,
 body.dark-mode .chart-container,
 body.dark-mode .games-details td,
 body.dark-mode .game-popup {
-    background-color: #23272a;
+    background-color: var(--background-color);
     color: var(--text-color);
 }
 
@@ -403,25 +403,25 @@ body.dark-mode th,
 body.dark-mode .team-combinations th,
 body.dark-mode .team-combinations .corner-header,
 body.dark-mode .team-combinations .player-header {
-    background-color: #1e2225;
+    background-color: var(--background-color);
     color: var(--text-color);
 }
 
 body.dark-mode tr:hover td,
 body.dark-mode .team-combinations .combination-cell:hover {
-    background-color: #23272a;
+    background-color: var(--background-color);
 }
 
 body.dark-mode button,
 body.dark-mode .expand-btn {
-    background-color: #23272a;
+    background-color: var(--background-color);
     color: var(--text-color);
     border-color: var(--border-color);
 }
 
 body.dark-mode button:hover,
 body.dark-mode .expand-btn:hover {
-    background-color: #181a1b;
+    background-color: var(--background-color);
     color: var(--primary-color);
 }
 
@@ -433,39 +433,17 @@ body.dark-mode .expand-btn.expanded {
 }
 
 body.dark-mode .game-item {
-    background: #1e2225;
+    background: var(--background-color);
     color: var(--text-color);
 }
 
 body.dark-mode .game-score {
-    background: #23272a;
+    background: var(--background-color);
     color: var(--text-color);
 }
 
 body.dark-mode .team-combinations .same-player {
-    background-color: #23272a;
-}
-
-body.dark-mode .calendar-day {
-    background-color: #23272a;
-    color: var(--text-color);
-    border-color: var(--border-color);
-}
-body.dark-mode .calendar-day.has-games {
-    background-color: #1e293b;
-}
-body.dark-mode .calendar-day.has-games:hover {
-    background-color: #334155;
-}
-body.dark-mode .calendar-day.today {
-    border: 2px solid var(--primary-color);
-}
-body.dark-mode .calendar-day.other-month {
-    background-color: #181a1b;
-    color: #64748b;
-}
-body.dark-mode .weekday-header {
-    color: var(--text-color);
+    background-color: var(--background-color);
 }
 
 .dark-mode-toggle {
