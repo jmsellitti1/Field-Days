@@ -433,7 +433,7 @@ body.dark-mode .expand-btn.expanded {
 }
 
 body.dark-mode .game-item {
-    background: var(--background-color);
+    background: #23272a;
     color: var(--text-color);
 }
 
@@ -444,6 +444,23 @@ body.dark-mode .game-score {
 
 body.dark-mode .team-combinations .same-player {
     background-color: var(--background-color);
+}
+
+body.dark-mode .game-button {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-mode .game-button:hover {
+    background-color: var(--background-color);
+    color: var(--primary-color);
+}
+
+body.dark-mode .game-button.active {
+    background-color: var(--primary-color);
+    color: #181a1b;
+    border-color: var(--primary-color);
 }
 
 .dark-mode-toggle {
