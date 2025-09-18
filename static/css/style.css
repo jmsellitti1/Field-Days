@@ -526,6 +526,7 @@ body.dark-mode .season-select {
 body.dark-mode .season-select:hover,
 body.dark-mode .season-select:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 body.dark-mode header {
