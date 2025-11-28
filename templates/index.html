@@ -658,8 +658,7 @@
                         }
                     }
                 }
-            }
-            resizeObserver.observe(document.getElementById('gameStatsChart'));
+            });
         }
 
         function addBarLabels(ctx, data, recordLabels) {
@@ -699,12 +698,6 @@
             if (gameStatsScatterChart) {
                 gameStatsScatterChart.destroy();
             }
-        function createGameStatsScatter(labels, games, winPcts, gameName, season) {
-            const ctx = document.getElementById('gameStatsScatter').getContext('2d');
-
-            if (gameStatsScatterChart) {
-                gameStatsScatterChart.destroy();
-            }
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
@@ -713,6 +706,11 @@
 
             const recordLabels = winPcts.map(pct => pct.toFixed(1) + '%');
             const dataPoints = labels.map((name, i) => ({ x: games[i], y: winPcts[i], name, record: recordLabels[i] }));
+
+            gameStatsScatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
                         data: dataPoints,
                         backgroundColor: pointColor,
                         borderColor: pointColor,

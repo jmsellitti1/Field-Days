@@ -28,13 +28,18 @@ def load_data():
 def index():
     teams, days, season_stats = load_data()
     teams_data = teams.to_dict('records')
-    
-    days['Date'] = pd.to_datetime(days['Date'], format='%m/%d/%y')
-    
+
+    days['Date'] = pd.to_datetime(days['Date'], format='mixed')
     days = days.sort_values('Date', ascending=False)
     
     days_data = days.to_dict('records')
     for day in days_data:
+        if not isinstance(day['Date'], pd.Timestamp):
+            try:
+                day['Date'] = pd.to_datetime(day['Date'], format='mixed')
+            except Exception:
+                day['year'] = None
+                continue
         day['year'] = day['Date'].year
         day['Date'] = day['Date'].strftime('%m/%d/%Y')
     
