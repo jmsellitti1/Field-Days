@@ -113,6 +113,9 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="chart-container" style="height: 400px; margin-top: 20px;">
+                    <canvas id="playerStatsScatter"></canvas>
+                </div>
             </section>
 
             <section id="teams">
@@ -350,6 +353,7 @@
         let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
         let gameStatsChart = null;
         let gameStatsScatterChart = null;
+        let playerStatsScatterChart = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#days tbody .day-row');
@@ -433,6 +437,10 @@
                 showGameStats(firstGameButton.dataset.game);
             }
 
+            // Initialize player stats scatter plot
+            const initialSeason = document.getElementById('playerStatsSeasonSelect').value;
+            updatePlayerStatsScatter(initialSeason);
+
             if (darkModeToggle) darkModeToggle.addEventListener('click', () => {
                 body.classList.toggle('dark-mode');
                 const isDark = body.classList.contains('dark-mode');
@@ -444,6 +452,11 @@
                     if (activeGameButton) {
                         showGameStats(activeGameButton.dataset.game);
                     }
+                }
+                
+                if (playerStatsScatterChart) {
+                    const currentSeason = document.getElementById('playerStatsSeasonSelect').value;
+                    updatePlayerStatsScatter(currentSeason);
                 }
             });
             
@@ -466,6 +479,114 @@
                     <td>${player.Clown}</td>
                 `;
                 tbody.appendChild(row);
+            });
+
+            updatePlayerStatsScatter(season);
+        }
+
+        function updatePlayerStatsScatter(season) {
+            const ctx = document.getElementById('playerStatsScatter').getContext('2d');
+
+            if (playerStatsScatterChart) {
+                playerStatsScatterChart.destroy();
+            }
+
+            const statsToShow = seasonStats[season] || [];
+            if (!statsToShow || statsToShow.length === 0) {
+                return;
+            }
+
+            const dataPoints = statsToShow
+                .filter(player => player['Days Pct'] != null && player['Games Pct'] != null)
+                .map(player => ({
+                    x: player['Days Pct'] * 100,
+                    y: player['Games Pct'] * 100,
+                    name: player.Name
+                }));
+
+            if (dataPoints.length === 0) {
+                return;
+            }
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
+            const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(37, 99, 235, 0.8)';
+
+            playerStatsScatterChart = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        data: dataPoints,
+                        backgroundColor: pointColor,
+                        borderColor: pointColor,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Days Win % vs Games Win %${season !== 'total' ? ' (' + season + ')' : ''}`,
+                            color: textColor,
+                            font: { size: 18, weight: 'bold' }
+                        },
+                        tooltip: {
+                            backgroundColor: isDarkMode ? '#23272a' : 'white',
+                            titleColor: textColor,
+                            bodyColor: textColor,
+                            borderColor: borderColor,
+                            borderWidth: 1,
+                            callbacks: {
+                                title: () => '',
+                                label: (ctx) => {
+                                    const point = ctx.raw;
+                                    return [
+                                        `Player: ${point.name}`,
+                                        `Days Win %: ${point.x.toFixed(1)}%`,
+                                        `Games Win %: ${point.y.toFixed(1)}%`
+                                    ];
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            title: { 
+                                display: true, 
+                                text: 'Days Win Percentage (%)', 
+                                color: textColor,
+                                font: { size: 14, weight: '600' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                callback: (value) => value + '%'
+                            },
+                            grid: { color: borderColor },
+                            min: 0,
+                            max: 100
+                        },
+                        y: {
+                            title: { 
+                                display: true, 
+                                text: 'Games Win Percentage (%)', 
+                                color: textColor,
+                                font: { size: 14, weight: '600' }
+                            },
+                            ticks: { 
+                                color: textColor,
+                                callback: (value) => value + '%'
+                            },
+                            grid: { color: borderColor },
+                            min: 0,
+                            max: 100
+                        }
+                    }
+                }
             });
         }
 
