@@ -63,27 +63,6 @@
             max-height: 80vh;
             overflow-y: auto;
         }
-
-        .game-popup-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .close-popup {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            border: none;
-            background: none;
-            font-size: 20px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -531,16 +510,11 @@
                 const total = player.wins + player.losses;
                 return total > 0 ? (player.wins / total * 100) : 0;
             });
-            const recordLabels = players.map(player => {
-                const total = player.wins + player.losses;
-                const winPct = total > 0 ? (player.wins / total * 100) : 0;
-                return `${player.wins}-${player.losses} (${winPct.toFixed(1)}%)`;
-            });
 
             const gamesPlayed = players.map(player => player.wins + player.losses);
 
-            createGameStatsChart(labels, data, recordLabels, gameName, season);
-            createGameStatsScatter(labels, gamesPlayed, data, recordLabels, gameName, season);
+            createGameStatsChart(labels, data, gameName, season);
+            createGameStatsScatter(labels, gamesPlayed, data, gameName, season);
         }
 
         function updateGameStats() {
@@ -603,7 +577,7 @@
             ctx.restore();
         }
 
-        function createGameStatsChart(labels, data, recordLabels, gameName, season) {
+        function createGameStatsChart(labels, data, gameName, season) {
             const ctx = document.getElementById('gameStatsChart').getContext('2d');
             
             if (gameStatsChart) {
@@ -613,6 +587,8 @@
             const isDarkMode = document.body.classList.contains('dark-mode');
             const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
             const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
+            
+            const recordLabels = data.map(d => d.toFixed(1) + '%');
 
             gameStatsChart = new Chart(ctx, {
                 type: 'bar',
@@ -649,17 +625,7 @@
                             titleColor: textColor,
                             bodyColor: textColor,
                             borderColor: borderColor,
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    return `Win %: ${context.parsed.y.toFixed(1)}%`;
-                                },
-                                afterLabel: function(context) {
-                                    const fullLabel = recordLabels[context.dataIndex];
-                                    const recordPart = fullLabel.split(' (')[0];
-                                    return `Record: ${recordPart}`;
-                                }
-                            }
+                            borderWidth: 1
                         }
                     },
                     scales: {
@@ -692,15 +658,7 @@
                         }
                     }
                 }
-            });
-
-            addBarLabels(ctx, data, recordLabels);
-            
-            const resizeObserver = new ResizeObserver(() => {
-                if (gameStatsChart) {
-                    addBarLabels(ctx, data, recordLabels);
-                }
-            });
+            }
             resizeObserver.observe(document.getElementById('gameStatsChart'));
         }
 
@@ -735,7 +693,13 @@
             });
         }
 
-        function createGameStatsScatter(labels, games, winPcts, recordLabels, gameName, season) {
+        function createGameStatsScatter(labels, games, winPcts, gameName, season) {
+            const ctx = document.getElementById('gameStatsScatter').getContext('2d');
+
+            if (gameStatsScatterChart) {
+                gameStatsScatterChart.destroy();
+            }
+        function createGameStatsScatter(labels, games, winPcts, gameName, season) {
             const ctx = document.getElementById('gameStatsScatter').getContext('2d');
 
             if (gameStatsScatterChart) {
@@ -747,13 +711,8 @@
             const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
             const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.9)' : 'rgba(37, 99, 235, 0.9)';
 
+            const recordLabels = winPcts.map(pct => pct.toFixed(1) + '%');
             const dataPoints = labels.map((name, i) => ({ x: games[i], y: winPcts[i], name, record: recordLabels[i] }));
-
-            gameStatsScatterChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Win % vs Games Played',
                         data: dataPoints,
                         backgroundColor: pointColor,
                         borderColor: pointColor,

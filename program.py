@@ -24,7 +24,7 @@ Usage:
 # Configuration constants
 CONFIG = {
     "EXCEL_FILE": Path("./Field_Days.xlsx"),
-    "SEASONS_RANGE": range(23, 26),  # Current seasons range
+    "SEASONS_RANGE": range(2023, 2026),  # CURRENT SEASONS RANGE
     "GAME_TYPES": {
         "PK's": "pk",
         "Cross": "cross",
@@ -67,7 +67,7 @@ Tracks wins, losses, and various other statistics across different game types.""
 
 # Global lists of players and names for season resets
 players: List['Player'] = []
-player_names = ["Aaron",  "AB",  "Anthony",  "Brandon", "Eric", "Jacob", "Kiernan", "Quinn", "Sam G", "Sam S", "Tighe"]
+player_names = ["Aaron",  "AB",  "Anthony",  "Brandon", "Chris", "Eric", "Jacob", "Kiernan", "Quinn", "Sam G", "Sam S", "Tighe"]
 
 
 # CLASS/OBJECT DEFINITIONS
@@ -325,6 +325,14 @@ def update_stat(table: pd.DataFrame, player_num: int, wins: int, losses: int, re
     table.at[player_num, record] = f"{wins}-{losses}"
     table.at[player_num, pct] = 0 if wins == 0 and losses == 0 else round(wins / (wins + losses), 4)
 
+def get_active_players(days_list: List[Day]) -> List[Player]:
+    """Return a sorted list of players who played at least one day in the given season."""
+    active_names = set()
+    for day in days_list:
+        for player in day.team1 + day.team2:
+            active_names.add(player.name)
+    return sorted([get_player(name) for name in active_names], key=lambda p: p.name.lower())
+
 
 def validate_score(score_str: str) -> bool:
     """Validate score string format (X-Y).
@@ -362,11 +370,11 @@ def get_new_day_input() -> List:
         nd_date = input("Date (MM/DD/YY): ").strip()
         try:
             month, day, year = map(int, nd_date.split("/"))
-            if 1 <= month <= 12 and 1 <= day <= 31 and 0 <= year <= 99:
+            if 1 <= month <= 12 and 1 <= day <= 31 and 0 <= year <= 9999:
                 break
-            print("Error: Invalid date values. Month: 1-12, Day: 1-31, Year: 00-99")
+            print("Error: Invalid date values. Month: 1-12, Day: 1-31, Year: 00-9999")
         except ValueError:
-            print("Error: Invalid date format. Use MM/DD/YY (e.g., 05/15/24)")
+            print("Error: Invalid date format. Use MM/DD/YYYY (e.g., 05/15/2024)")
     
     # Get and validate teams
     while True:
@@ -505,7 +513,22 @@ def read_excel(filename: str, season: int = None, new_day: bool = False) -> List
                 raise
     
     for index, row in days_df.iterrows():
-        if not season or (season and str(row['Date']).split("/")[-1] == str(season)):
+        # Extract year from date, whether it's a string or datetime
+        if isinstance(row['Date'], pd.Timestamp):
+            year_full = row['Date'].year
+        else:
+            date_str = str(row['Date'])
+            try:
+                # Try parsing as MM/DD/YYYY
+                if "-" in date_str:
+                    year_full = int(date_str.split("-")[0])
+                else:
+                    year_part = int(date_str.split("/")[-1])
+                    year_full = year_part if year_part > 1000 else 2000 + year_part
+            except Exception:
+                print(f"Warning: Invalid date format '{date_str}' at row {index}. Skipping row.")
+                continue
+        if not season or (season and year_full == int(season)):
             team1 = init_team(row['Team 1'].split(", "))
             team2 = init_team(row['Team 2'].split(", "))
             score = row['Score']
@@ -573,12 +596,12 @@ def parse_days(days_list: List[Day]) -> None:
             add_loss(game.name, game_losing_team, game_winning_team_score)
 
 
-def update_excel(filename: str, season: Optional[int] = None) -> None:
+def update_excel(filename: str, season: Optional[int] = None, active_players: Optional[List[Player]] = None) -> None:
     """Update Excel spreadsheet with current player statistics.
     
     Args:
         filename (str): Path to the Excel file.
-        season (Optional[int], optional): Two-digit year to write stats for.
+        season (Optional[int], optional): Four-digit year to write stats for.
             If None, writes to main Stats sheet and Teams sheet.
     
     Raises:
@@ -588,14 +611,20 @@ def update_excel(filename: str, season: Optional[int] = None) -> None:
     stats = pd.read_excel(filename, sheet_name="Stats")
     teams = pd.read_excel(filename, sheet_name="Teams")
     
-    sorted_players = sorted(players, key=lambda p: p.name.lower())
-
+    if active_players is not None:
+        sorted_players = active_players
+    else:
+        sorted_players = sorted(players, key=lambda p: p.name.lower())
 
     # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS OR GAMES ARE ADDED
     for player in sorted_players:
-        wins = [player.stats["days"].wins, player.stats["games"].wins, player.stats["pk"].wins, player.stats["cross"].wins,
+        days_wins = player.stats["days"].wins
+        days_losses = player.stats["days"].losses
+        if season and days_wins == 0 and days_losses == 0:
+            continue
+        wins = [days_wins, player.stats["games"].wins, player.stats["pk"].wins, player.stats["cross"].wins,
                 player.stats["ad"].wins, player.stats["pf"].wins, player.stats["ss"].wins, player.stats["fk"].wins]
-        losses = [player.stats["days"].losses, player.stats["games"].losses, player.stats["pk"].losses, player.stats["cross"].losses,
+        losses = [days_losses, player.stats["games"].losses, player.stats["pk"].losses, player.stats["cross"].losses,
                   player.stats["ad"].losses, player.stats["pf"].losses, player.stats["ss"].losses, player.stats["fk"].losses]
         record_text = ['Days Record', 'Games Record', "PK's Record", 'Cross Record',
                        'A/D Record', 'P&F Record', 'SS Record', "FK's Record"]
@@ -608,14 +637,14 @@ def update_excel(filename: str, season: Optional[int] = None) -> None:
         stats.at[(sorted_players.index(player)), 'MVP'] = player.mvp
         stats.at[(sorted_players.index(player)), 'Clown'] = player.clown
         stats.at[(sorted_players.index(player)), '(Name)'] = player.name
-        
+
         if not season:
             for teammate in player.teammates.items():
-                teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (player.stats["days"].wins + player.stats["days"].losses), 3)
+                teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (days_wins + days_losses), 3)
                 
     with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         if season:
-            stats.to_excel(writer, sheet_name='20' + str(season) + ' Stats', index=False, startrow=0, startcol=0)
+            stats.to_excel(writer, sheet_name=str(season) + ' Stats', index=False, startrow=0, startcol=0)
         else:
             stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
             teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
@@ -640,13 +669,14 @@ def main() -> None:
         parse_days(days)
         update_excel(filename)
         print(f"Processed {len(days)} total days")
-        
+
         # Process individual seasons
         for season in CONFIG["SEASONS_RANGE"]:
             yr_days = read_excel(filename, season)
             parse_days(yr_days)
-            update_excel(filename, season)
-            print(f"Processed {len(yr_days)} days for 20{season} season")
+            active_players = get_active_players(yr_days)
+            update_excel(filename, season, active_players)
+            print(f"Processed {len(yr_days)} days for {season} season")
     
     except Exception as e:
         print(f"Error: {str(e)}")
