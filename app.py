@@ -5,21 +5,21 @@ app = Flask(__name__)
 
 def load_data():
     excel_file = "Field_Days.xlsx"
-    teams = pd.read_excel(excel_file, sheet_name="Teams")
-    days = pd.read_excel(excel_file, sheet_name="Days")
+    excel = pd.ExcelFile(excel_file)
     
-    all_sheets = pd.ExcelFile(excel_file).sheet_names
+    teams = excel.parse(sheet_name="Teams")
+    days = excel.parse(sheet_name="Days")
     
     season_stats = {
-        'total': pd.read_excel(excel_file, sheet_name="Stats")
+        'total': excel.parse(sheet_name="Stats")
     }
     
-    for sheet in all_sheets:
-        if sheet.endswith("Stats") and sheet != "Stats":
+    for sheet in excel.sheet_names:
+        if sheet.endswith(" Stats") and sheet != "Stats":
             year = sheet.replace(" Stats", "")
             try:
-                season_stats[year] = pd.read_excel(excel_file, sheet_name=sheet)
-            except:
+                season_stats[year] = excel.parse(sheet_name=sheet)
+            except (ValueError, KeyError) as e:
                 continue
             
     return teams, days, season_stats
@@ -29,19 +29,24 @@ def index():
     teams, days, season_stats = load_data()
     teams_data = teams.to_dict('records')
 
-    days['Date'] = pd.to_datetime(days['Date'], format='mixed')
+    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='coerce')
     days = days.sort_values('Date', ascending=False)
     
     days_data = days.to_dict('records')
     for day in days_data:
-        if not isinstance(day['Date'], pd.Timestamp):
-            try:
-                day['Date'] = pd.to_datetime(day['Date'], format='mixed')
-            except Exception:
+        date_obj = day['Date']
+        if pd.isna(date_obj):
+            day['year'] = None
+            day['Date'] = ''
+        else:
+            if not isinstance(date_obj, pd.Timestamp):
+                date_obj = pd.to_datetime(date_obj, format='mixed', errors='coerce')
+            if pd.isna(date_obj):
                 day['year'] = None
-                continue
-        day['year'] = day['Date'].year
-        day['Date'] = day['Date'].strftime('%m/%d/%Y')
+                day['Date'] = ''
+            else:
+                day['year'] = date_obj.year
+                day['Date'] = date_obj.strftime('%m/%d/%Y')
     
     cleaned_season_stats = {}
     for year, data in season_stats.items():

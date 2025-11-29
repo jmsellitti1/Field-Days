@@ -393,8 +393,7 @@ body.dark-mode {
 body.dark-mode .container,
 body.dark-mode .table-container,
 body.dark-mode .chart-container,
-body.dark-mode .games-details td,
-body.dark-mode .game-popup {
+body.dark-mode .games-details td {
     background-color: var(--background-color);
     color: var(--text-color);
 }
@@ -513,10 +512,6 @@ header {
     border-bottom: 1px solid var(--border-color);
 }
 
-body.dark-mode .game-popup {
-    background: #23272a;
-    color: var(--text-color);
-}
 
 body.dark-mode .season-select {
     background-color: #23272a;

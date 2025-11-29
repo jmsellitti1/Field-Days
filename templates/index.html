@@ -47,22 +47,6 @@
             font-size: 14px;
             cursor: pointer;
         }
-
-        .game-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            max-width: 80%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
     </style>
 </head>
 <body>
@@ -355,6 +339,26 @@
         let gameStatsScatterChart = null;
         let playerStatsScatterChart = null;
 
+        function getChartColors() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
+            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
+            const backgroundColor = isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(37, 99, 235, 0.8)';
+            const borderColorSolid = isDarkMode ? 'rgba(96, 165, 250, 1)' : 'rgba(37, 99, 235, 1)';
+            const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.9)' : 'rgba(37, 99, 235, 0.9)';
+            const tooltipBg = isDarkMode ? '#23272a' : 'white';
+            
+            return {
+                isDarkMode,
+                textColor,
+                borderColor,
+                backgroundColor,
+                borderColorSolid,
+                pointColor,
+                tooltipBg
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const rows = document.querySelectorAll('#days tbody .day-row');
             rows.forEach(row => {
@@ -508,18 +512,15 @@
                 return;
             }
 
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
-            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
-            const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(37, 99, 235, 0.8)';
+            const colors = getChartColors();
 
             playerStatsScatterChart = new Chart(ctx, {
                 type: 'scatter',
                 data: {
                     datasets: [{
                         data: dataPoints,
-                        backgroundColor: pointColor,
-                        borderColor: pointColor,
+                        backgroundColor: colors.pointColor,
+                        borderColor: colors.pointColor,
                         pointRadius: 6,
                         pointHoverRadius: 8,
                     }]
@@ -531,14 +532,14 @@
                         title: {
                             display: true,
                             text: `Days Win % vs Games Win %${season !== 'total' ? ' (' + season + ')' : ''}`,
-                            color: textColor,
+                            color: colors.textColor,
                             font: { size: 18, weight: 'bold' }
                         },
                         tooltip: {
-                            backgroundColor: isDarkMode ? '#23272a' : 'white',
-                            titleColor: textColor,
-                            bodyColor: textColor,
-                            borderColor: borderColor,
+                            backgroundColor: colors.tooltipBg,
+                            titleColor: colors.textColor,
+                            bodyColor: colors.textColor,
+                            borderColor: colors.borderColor,
                             borderWidth: 1,
                             callbacks: {
                                 title: () => '',
@@ -559,14 +560,14 @@
                             title: { 
                                 display: true, 
                                 text: 'Days Win Percentage (%)', 
-                                color: textColor,
+                                color: colors.textColor,
                                 font: { size: 14, weight: '600' }
                             },
                             ticks: { 
-                                color: textColor,
+                                color: colors.textColor,
                                 callback: (value) => value + '%'
                             },
-                            grid: { color: borderColor },
+                            grid: { color: colors.borderColor },
                             min: 0,
                             max: 100
                         },
@@ -574,14 +575,14 @@
                             title: { 
                                 display: true, 
                                 text: 'Games Win Percentage (%)', 
-                                color: textColor,
+                                color: colors.textColor,
                                 font: { size: 14, weight: '600' }
                             },
                             ticks: { 
-                                color: textColor,
+                                color: colors.textColor,
                                 callback: (value) => value + '%'
                             },
-                            grid: { color: borderColor },
+                            grid: { color: colors.borderColor },
                             min: 0,
                             max: 100
                         }
@@ -705,11 +706,7 @@
                 gameStatsChart.destroy();
             }
 
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
-            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
-            
-            const recordLabels = data.map(d => d.toFixed(1) + '%');
+            const colors = getChartColors();
 
             gameStatsChart = new Chart(ctx, {
                 type: 'bar',
@@ -718,8 +715,8 @@
                     datasets: [{
                         label: 'Win Percentage',
                         data: data,
-                        backgroundColor: isDarkMode ? 'rgba(96, 165, 250, 0.8)' : 'rgba(37, 99, 235, 0.8)',
-                        borderColor: isDarkMode ? 'rgba(96, 165, 250, 1)' : 'rgba(37, 99, 235, 1)',
+                        backgroundColor: colors.backgroundColor,
+                        borderColor: colors.borderColorSolid,
                         borderWidth: 1,
                         borderRadius: 4,
                         borderSkipped: false,
@@ -736,16 +733,16 @@
                                 size: 18,
                                 weight: 'bold'
                             },
-                            color: textColor
+                            color: colors.textColor
                         },
                         legend: {
                             display: false
                         },
                         tooltip: {
-                            backgroundColor: isDarkMode ? '#23272a' : 'white',
-                            titleColor: textColor,
-                            bodyColor: textColor,
-                            borderColor: borderColor,
+                            backgroundColor: colors.tooltipBg,
+                            titleColor: colors.textColor,
+                            bodyColor: colors.textColor,
+                            borderColor: colors.borderColor,
                             borderWidth: 1
                         }
                     },
@@ -757,15 +754,15 @@
                                 callback: function(value) {
                                     return value + '%';
                                 },
-                                color: textColor
+                                color: colors.textColor
                             },
                             grid: {
-                                color: borderColor
+                                color: colors.borderColor
                             }
                         },
                         x: {
                             ticks: {
-                                color: textColor
+                                color: colors.textColor
                             },
                             grid: {
                                 display: false
@@ -782,37 +779,6 @@
             });
         }
 
-        function addBarLabels(ctx, data, recordLabels) {
-            const chart = gameStatsChart;
-            const meta = chart.getDatasetMeta(0);
-            
-            recordLabels.forEach((label, index) => {
-                const bar = meta.data[index];
-                if (bar) {
-                    const x = bar.x;
-                    const y = bar.y - 10;
-                    
-                    ctx.save();
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'bottom';
-                    ctx.font = '12px Inter, sans-serif';
-                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color');
-                    
-                    const textMetrics = ctx.measureText(label);
-                    const padding = 4;
-                    const bgWidth = textMetrics.width + (padding * 2);
-                    const bgHeight = 16;
-                    
-                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--background-color');
-                    ctx.fillRect(x - bgWidth/2, y - bgHeight - 2, bgWidth, bgHeight);
-                    
-                    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text-color');
-                    ctx.fillText(label, x, y);
-                    ctx.restore();
-                }
-            });
-        }
-
         function createGameStatsScatter(labels, games, winPcts, gameName, season) {
             const ctx = document.getElementById('gameStatsScatter').getContext('2d');
 
@@ -820,11 +786,7 @@
                 gameStatsScatterChart.destroy();
             }
 
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color');
-            const borderColor = getComputedStyle(document.body).getPropertyValue('--border-color');
-            const pointColor = isDarkMode ? 'rgba(96, 165, 250, 0.9)' : 'rgba(37, 99, 235, 0.9)';
-
+            const colors = getChartColors();
             const recordLabels = winPcts.map(pct => pct.toFixed(1) + '%');
             const dataPoints = labels.map((name, i) => ({ x: games[i], y: winPcts[i], name, record: recordLabels[i] }));
 
@@ -833,8 +795,8 @@
                 data: {
                     datasets: [{
                         data: dataPoints,
-                        backgroundColor: pointColor,
-                        borderColor: pointColor,
+                        backgroundColor: colors.pointColor,
+                        borderColor: colors.pointColor,
                         pointRadius: 4,
                     }]
                 },
@@ -845,14 +807,14 @@
                         title: {
                             display: true,
                             text: `${gameName} - Win % vs Games${season !== 'total' ? ' (' + season + ')' : ''}`,
-                            color: textColor,
+                            color: colors.textColor,
                             font: { size: 18, weight: 'bold' }
                         },
                         tooltip: {
-                            backgroundColor: isDarkMode ? '#23272a' : 'white',
-                            titleColor: textColor,
-                            bodyColor: textColor,
-                            borderColor: borderColor,
+                            backgroundColor: colors.tooltipBg,
+                            titleColor: colors.textColor,
+                            bodyColor: colors.textColor,
+                            borderColor: colors.borderColor,
                             borderWidth: 1,
                             callbacks: {
                                 label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(1)}%`,
@@ -863,16 +825,16 @@
                     },
                     scales: {
                         x: {
-                            title: { display: true, text: 'Games Played', color: textColor },
-                            ticks: { color: textColor },
-                            grid: { color: borderColor }
+                            title: { display: true, text: 'Games Played', color: colors.textColor },
+                            ticks: { color: colors.textColor },
+                            grid: { color: colors.borderColor }
                         },
                         y: {
-                            title: { display: true, text: 'Win %', color: textColor },
+                            title: { display: true, text: 'Win %', color: colors.textColor },
                             suggestedMin: 0,
                             suggestedMax: 100,
-                            ticks: { callback: (v) => v + '%', color: textColor },
-                            grid: { color: borderColor }
+                            ticks: { callback: (v) => v + '%', color: colors.textColor },
+                            grid: { color: colors.borderColor }
                         }
                     }
                 }
