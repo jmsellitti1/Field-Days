@@ -616,12 +616,22 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
     else:
         sorted_players = sorted(players, key=lambda p: p.name.lower())
 
+    # For season sheets, only include players who played at least one day in that season
+    filtered_players = []
+    if season:
+        for player in sorted_players:
+            days_wins = player.stats["days"].wins
+            days_losses = player.stats["days"].losses
+            if days_wins == 0 and days_losses == 0:
+                continue
+            filtered_players.append(player)
+    else:
+        filtered_players = sorted_players
+
     # EXCEL ROW/COLUMN HEADERS NEED TO BE MANUALLY UPDATED IF/WHEN MORE PLAYERS OR GAMES ARE ADDED
-    for player in sorted_players:
+    for idx, player in enumerate(filtered_players):
         days_wins = player.stats["days"].wins
         days_losses = player.stats["days"].losses
-        if season and days_wins == 0 and days_losses == 0:
-            continue
         wins = [days_wins, player.stats["games"].wins, player.stats["pk"].wins, player.stats["cross"].wins,
                 player.stats["ad"].wins, player.stats["pf"].wins, player.stats["ss"].wins, player.stats["fk"].wins]
         losses = [days_losses, player.stats["games"].losses, player.stats["pk"].losses, player.stats["cross"].losses,
@@ -631,20 +641,21 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
         pct_txt = ['Days Pct', 'Games Pct', "PK's Pct", 'Cross Pct', 'A/D Pct',
                    'P&F Pct', 'SS Pct', "FK's Pct"]
 
-        stats.at[(sorted_players.index(player)), 'Name'] = player.name
+        stats.at[idx, 'Name'] = player.name
         for i in range(len(wins)):
-            update_stat(stats, (sorted_players.index(player)), wins[i], losses[i], record_text[i], pct_txt[i])
-        stats.at[(sorted_players.index(player)), 'MVP'] = player.mvp
-        stats.at[(sorted_players.index(player)), 'Clown'] = player.clown
-        stats.at[(sorted_players.index(player)), '(Name)'] = player.name
+            update_stat(stats, idx, wins[i], losses[i], record_text[i], pct_txt[i])
+        stats.at[idx, 'MVP'] = player.mvp
+        stats.at[idx, 'Clown'] = player.clown
+        stats.at[idx, '(Name)'] = player.name
 
         if not season:
             for teammate in player.teammates.items():
-                teams.at[(sorted_players.index(player)), teammate[0]] = round(teammate[1] / (days_wins + days_losses), 3)
-                
+                stats_days_total = days_wins + days_losses
+                teams.at[idx, teammate[0]] = round(teammate[1] / stats_days_total, 3) if stats_days_total > 0 else 0
+
     with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
         if season:
-            stats.to_excel(writer, sheet_name=str(season) + ' Stats', index=False, startrow=0, startcol=0)
+            stats.iloc[:len(filtered_players)].to_excel(writer, sheet_name=str(season) + ' Stats', index=False, startrow=0, startcol=0)
         else:
             stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
             teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
