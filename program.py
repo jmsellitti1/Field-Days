@@ -2,23 +2,17 @@ import pandas as pd
 from typing import List, Dict, Optional
 from dataclasses import dataclass
 from pathlib import Path
-import argparse
 import sys
-import textwrap
 
 """Field Days Statistics Tracker
 
 The module supports:
-- Multiple game types (PK's, Cross, A/D, etc.)
 - Player statistics tracking
 - Team formation and history
 - Season-based record keeping
-- Excel-based data storage and retrieval
 
 Usage:
-    python program.py                     # Process all data without adding new day
-    python program.py --new-day          # Add a new field day before processing
-    python program.py -h, --help         # Show this help message
+    python program.py
 """
 
 # Configuration constants
@@ -36,34 +30,6 @@ CONFIG = {
         "Games": "games"
     }
 }
-
-def parse_arguments() -> argparse.Namespace:
-    """Parse command line arguments.
-    
-    Returns:
-        argparse.Namespace: Parsed command line arguments.
-    """
-    parser = argparse.ArgumentParser(
-        description="""Field Days Statistics Tracker
-
-Processes field day statistics and maintains records in an Excel spreadsheet.
-Tracks wins, losses, and various other statistics across different game types.""",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent("""
-            Examples:
-                %(prog)s                    # Process all data
-                %(prog)s --new-day          # Add new field day
-                %(prog)s -h, --help         # Show this help message
-            """)
-    )
-    
-    parser.add_argument(
-        '--new-day',
-        action='store_true',
-        help='Add a new field day before processing data'
-    )
-    
-    return parser.parse_args()
 
 # Global lists of players and names for season resets
 players: List['Player'] = []
@@ -367,12 +333,12 @@ def get_new_day_input() -> List:
     
     # Get and validate date
     while True:
-        nd_date = input("Date (MM/DD/YY): ").strip()
+        nd_date = input("Date (MM/DD/YYYY): ").strip()
         try:
             month, day, year = map(int, nd_date.split("/"))
-            if 1 <= month <= 12 and 1 <= day <= 31 and 0 <= year <= 9999:
+            if 1 <= month <= 12 and 1 <= day <= 31 and len(str(year)) in [2, 4]:
                 break
-            print("Error: Invalid date values. Month: 1-12, Day: 1-31, Year: 00-9999")
+            print("Error: Invalid date values. Month: 1-12, Day: 1-31, Year: 0000-9999")
         except ValueError:
             print("Error: Invalid date format. Use MM/DD/YYYY (e.g., 05/15/2024)")
     
@@ -662,21 +628,18 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
 
 
 def main() -> None:
-    """Main program entry point.
-    
-    Processes field day data according to command line arguments:
-    - With no arguments: processes all data
-    - With --new-day: adds a new field day before processing
+    """Main program entry point - Processes field day data
     
     Returns:
         int: 0 for success, 1 for error
     """
-    args = parse_arguments()
     filename = CONFIG["EXCEL_FILE"]
+    
+    new_day = input("Do you want to add a new day? (y/n): ").strip().lower() in ['y', 'yes']
     
     try:
         print("Processing all field days...")
-        days = read_excel(filename, new_day=args.new_day)
+        days = read_excel(filename, new_day=new_day)
         parse_days(days)
         update_excel(filename)
         print(f"Processed {len(days)} total days")
