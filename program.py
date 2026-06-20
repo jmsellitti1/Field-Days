@@ -747,15 +747,20 @@ def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
         filename (str): Path to the Excel file.
         output_dir (str): Directory to save JSON files to.
     """
+    global player_names
+    
     output_path = Path(output_dir)
     output_path.mkdir(exist_ok=True)
     
     teams = pd.read_excel(filename, sheet_name="Teams")
     teams_data = teams.to_dict('records')
     
-    # Clean NaN values
+    # Clean NaN values and keep only rows with a valid player name
     cleaned_teams = []
     for record in teams_data:
+        name = record.get('Name')
+        if name not in player_names:
+            continue
         cleaned_record = {}
         for key, value in record.items():
             if pd.isna(value):
