@@ -894,7 +894,7 @@ def export_metadata_to_json(seasons_range: range, players_list: List[str], outpu
     print(f"Exported metadata to {output_path / 'metadata.json'}")
 
 
-def export_all_data(filename: str, seasons_range: range, players_list: List[str], output_dir: str = "./data") -> None:
+def export_all_data(filename: str, seasons_range: range, players_list: List[str], output_dir: str = "./docs/data") -> None:
     """Export all necessary data for GitHub Pages site.
     
     Args:

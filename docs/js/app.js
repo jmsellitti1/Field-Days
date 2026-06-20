@@ -10,16 +10,13 @@ let allData = {
 // Load all data from JSON files
 async function loadData() {
     try {
-        // Determine the base path for data files
-        // GitHub Pages will serve from the root when published
-        const basePath = window.location.pathname.includes('/Field-Days/') ? '/Field-Days/' : '/';
-        
+        const dataPath = './data/';
         const [statsRes, teamsRes, daysRes, seasonStatsRes, metadataRes] = await Promise.all([
-            fetch(`${basePath}data/stats.json`),
-            fetch(`${basePath}data/teams.json`),
-            fetch(`${basePath}data/days.json`),
-            fetch(`${basePath}data/season_stats.json`),
-            fetch(`${basePath}data/metadata.json`)
+            fetch(`${dataPath}stats.json`),
+            fetch(`${dataPath}teams.json`),
+            fetch(`${dataPath}days.json`),
+            fetch(`${dataPath}season_stats.json`),
+            fetch(`${dataPath}metadata.json`)
         ]);
 
         if (!statsRes.ok) throw new Error(`Failed to load stats: ${statsRes.status}`);
