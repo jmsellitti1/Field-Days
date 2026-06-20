@@ -1,8 +1,5 @@
 **/.DS_Store
 
-# Excel file
-**/Field_Days.xlsx
-
 # Python
 __pycache__/
 *.py[cod]

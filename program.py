@@ -18,7 +18,7 @@ Usage:
 # Configuration constants
 CONFIG = {
     "EXCEL_FILE": Path("./Field_Days.xlsx"),
-    "SEASONS_RANGE": range(2023, 2026),  # CURRENT SEASONS RANGE
+    "SEASONS_RANGE": range(2023, 2027),  # CURRENT SEASONS RANGE
     "GAME_TYPES": {
         "PK's": "pk",
         "Cross": "cross",
@@ -642,7 +642,7 @@ def main() -> None:
         days = read_excel(filename, new_day=new_day)
         parse_days(days)
         update_excel(filename)
-        print(f"Processed {len(days)} total days")
+        print(f"Processing {len(days)} total days")
 
         # Process individual seasons
         for season in CONFIG["SEASONS_RANGE"]:
