@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Days Statistics</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Field Days Statistics</h1>
+        </header>
+
+        <nav id="nav-buttons">
+            <button class="nav-btn active" data-section="stats">Overall Stats</button>
+            <button class="nav-btn" data-section="seasons">Season Stats</button>
+            <button class="nav-btn" data-section="teams">Teams</button>
+            <button class="nav-btn" data-section="days">Game History</button>
+        </nav>
+
+        <!-- Overall Stats Section -->
+        <section id="stats" class="active">
+            <h2>Overall Player Statistics</h2>
+            <div class="table-container">
+                <table id="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Days Record</th>
+                            <th>Days Pct</th>
+                            <th>Games Record</th>
+                            <th>Games Pct</th>
+                            <th>PK's Record</th>
+                            <th>PK's Pct</th>
+                            <th>Cross Record</th>
+                            <th>Cross Pct</th>
+                            <th>A/D Record</th>
+                            <th>A/D Pct</th>
+                            <th>P&F Record</th>
+                            <th>P&F Pct</th>
+                            <th>SS Record</th>
+                            <th>SS Pct</th>
+                            <th>FK's Record</th>
+                            <th>FK's Pct</th>
+                            <th>MVP</th>
+                            <th>Clown</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Season Stats Section -->
+        <section id="seasons">
+            <div class="section-header">
+                <h2>Season Statistics</h2>
+                <select id="season-select">
+                    <option value="total">All Time</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table id="season-stats-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Days Record</th>
+                            <th>Days Pct</th>
+                            <th>Games Record</th>
+                            <th>Games Pct</th>
+                            <th>PK's Record</th>
+                            <th>PK's Pct</th>
+                            <th>Cross Record</th>
+                            <th>Cross Pct</th>
+                            <th>A/D Record</th>
+                            <th>A/D Pct</th>
+                            <th>P&F Record</th>
+                            <th>P&F Pct</th>
+                            <th>SS Record</th>
+                            <th>SS Pct</th>
+                            <th>FK's Record</th>
+                            <th>FK's Pct</th>
+                            <th>MVP</th>
+                            <th>Clown</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Teams Section -->
+        <section id="teams">
+            <h2>Team Combinations (Games Together)</h2>
+            <div class="table-container">
+                <table id="teams-table" class="team-combinations">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="team-combinations-caption">Numbers represent the percentage of field days played together</p>
+        </section>
+
+        <!-- Days Section -->
+        <section id="days">
+            <h2>Game History</h2>
+            <div class="table-container">
+                <table id="days-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Team 1</th>
+                            <th>Team 2</th>
+                            <th>Score</th>
+                            <th>Games</th>
+                            <th>MVP</th>
+                            <th>Clown</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

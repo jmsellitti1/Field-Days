@@ -1,0 +1,32 @@
+{
+  "seasons": [
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "players": [
+    "AB",
+    "Aaron",
+    "Anthony",
+    "Brandon",
+    "Chris",
+    "Eric",
+    "Jacob",
+    "Kiernan",
+    "Quinn",
+    "Sam G",
+    "Sam S",
+    "Tighe"
+  ],
+  "game_types": [
+    "PK's",
+    "Cross",
+    "A/D",
+    "P&F",
+    "SS",
+    "FK's",
+    "Days",
+    "Games"
+  ]
+}

@@ -3,6 +3,7 @@ from typing import List, Dict, Optional
 from dataclasses import dataclass
 from pathlib import Path
 import sys
+import json
 
 """Field Days Statistics Tracker
 
@@ -18,7 +19,7 @@ Usage:
 # Configuration constants
 CONFIG = {
     "EXCEL_FILE": Path("./Field_Days.xlsx"),
-    "SEASONS_RANGE": range(2023, 2027),  # CURRENT SEASONS RANGE
+    "SEASONS_RANGE": range(2023, 2027),  # Will be updated dynamically
     "GAME_TYPES": {
         "PK's": "pk",
         "Cross": "cross",
@@ -33,7 +34,87 @@ CONFIG = {
 
 # Global lists of players and names for season resets
 players: List['Player'] = []
-player_names = ["Aaron",  "AB",  "Anthony",  "Brandon", "Chris", "Eric", "Jacob", "Kiernan", "Quinn", "Sam G", "Sam S", "Tighe"]
+player_names: List[str] = []
+
+
+# INITIALIZATION FUNCTIONS
+
+def extract_player_names(filename: str) -> List[str]:
+    """Extract all unique player names from the Days sheet in the Excel file.
+    
+    Args:
+        filename (str): Path to the Excel file.
+    
+    Returns:
+        List[str]: Sorted list of unique player names.
+    
+    Raises:
+        FileNotFoundError: If Excel file doesn't exist.
+    """
+    try:
+        days_df = pd.read_excel(filename, sheet_name="Days")
+        player_set = set()
+        
+        for index, row in days_df.iterrows():
+            if pd.notna(row['Team 1']):
+                team1_players = [p.strip() for p in str(row['Team 1']).split(",")]
+                player_set.update(team1_players)
+            if pd.notna(row['Team 2']):
+                team2_players = [p.strip() for p in str(row['Team 2']).split(",")]
+                player_set.update(team2_players)
+        
+        return sorted(list(player_set))
+    except FileNotFoundError:
+        print(f"Error: Excel file '{filename}' not found.")
+        raise
+    except Exception as e:
+        print(f"Error extracting player names: {e}")
+        raise
+
+
+def extract_seasons(filename: str) -> range:
+    """Extract the range of seasons (years) from the Days sheet in the Excel file.
+    
+    Args:
+        filename (str): Path to the Excel file.
+    
+    Returns:
+        range: Range of years from minimum to maximum year found in the data.
+    
+    Raises:
+        FileNotFoundError: If Excel file doesn't exist.
+    """
+    try:
+        days_df = pd.read_excel(filename, sheet_name="Days")
+        years = set()
+        
+        for index, row in days_df.iterrows():
+            if isinstance(row['Date'], pd.Timestamp):
+                years.add(row['Date'].year)
+            else:
+                date_str = str(row['Date'])
+                try:
+                    if "-" in date_str:
+                        year = int(date_str.split("-")[0])
+                    else:
+                        year_part = int(date_str.split("/")[-1])
+                        year = year_part if year_part > 1000 else 2000 + year_part
+                    years.add(year)
+                except Exception:
+                    pass
+        
+        if not years:
+            return range(2023, 2024)
+        
+        min_year = min(years)
+        max_year = max(years)
+        return range(min_year, max_year + 1)
+    except FileNotFoundError:
+        print(f"Error: Excel file '{filename}' not found.")
+        raise
+    except Exception as e:
+        print(f"Error extracting seasons: {e}")
+        raise
 
 
 # CLASS/OBJECT DEFINITIONS
@@ -627,13 +708,231 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
             teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
 
 
+# JSON EXPORT FUNCTIONS
+
+def export_player_stats_to_json(filename: str, output_dir: str = "./data") -> None:
+    """Export overall player statistics to JSON for GitHub Pages.
+    
+    Args:
+        filename (str): Path to the Excel file.
+        output_dir (str): Directory to save JSON files to.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    stats = pd.read_excel(filename, sheet_name="Stats")
+    stats_data = stats.to_dict('records')
+    
+    # Clean NaN values
+    cleaned_stats = []
+    for record in stats_data:
+        cleaned_record = {}
+        for key, value in record.items():
+            if pd.isna(value):
+                cleaned_record[key] = None
+            else:
+                cleaned_record[key] = value
+        cleaned_stats.append(cleaned_record)
+    
+    with open(output_path / "stats.json", "w") as f:
+        json.dump(cleaned_stats, f, indent=2)
+    
+    print(f"Exported player stats to {output_path / 'stats.json'}")
+
+
+def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
+    """Export teammate frequency data to JSON for GitHub Pages.
+    
+    Args:
+        filename (str): Path to the Excel file.
+        output_dir (str): Directory to save JSON files to.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    teams = pd.read_excel(filename, sheet_name="Teams")
+    teams_data = teams.to_dict('records')
+    
+    # Clean NaN values
+    cleaned_teams = []
+    for record in teams_data:
+        cleaned_record = {}
+        for key, value in record.items():
+            if pd.isna(value):
+                cleaned_record[key] = None
+            else:
+                cleaned_record[key] = value
+        cleaned_teams.append(cleaned_record)
+    
+    with open(output_path / "teams.json", "w") as f:
+        json.dump(cleaned_teams, f, indent=2)
+    
+    print(f"Exported teams data to {output_path / 'teams.json'}")
+
+
+def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
+    """Export game history (days) to JSON for GitHub Pages.
+    
+    Args:
+        filename (str): Path to the Excel file.
+        output_dir (str): Directory to save JSON files to.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    days = pd.read_excel(filename, sheet_name="Days")
+    
+    # Convert dates to proper format
+    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='coerce')
+    days = days.sort_values('Date', ascending=False)
+    
+    days_data = days.to_dict('records')
+    
+    # Clean and format data
+    cleaned_days = []
+    for day in days_data:
+        cleaned_day = {}
+        for key, value in day.items():
+            if pd.isna(value):
+                if key == 'Date':
+                    cleaned_day[key] = None
+                    cleaned_day['year'] = None
+                else:
+                    cleaned_day[key] = None
+            else:
+                if key == 'Date':
+                    if not isinstance(value, pd.Timestamp):
+                        value = pd.to_datetime(value, format='mixed', errors='coerce')
+                    if pd.isna(value):
+                        cleaned_day[key] = None
+                        cleaned_day['year'] = None
+                    else:
+                        cleaned_day['year'] = value.year
+                        cleaned_day[key] = value.strftime('%m/%d/%Y')
+                else:
+                    cleaned_day[key] = value
+        cleaned_days.append(cleaned_day)
+    
+    with open(output_path / "days.json", "w") as f:
+        json.dump(cleaned_days, f, indent=2)
+    
+    print(f"Exported days data to {output_path / 'days.json'}")
+
+
+def export_season_stats_to_json(filename: str, seasons_range: range, output_dir: str = "./data") -> None:
+    """Export season-specific statistics to JSON for GitHub Pages.
+    
+    Args:
+        filename (str): Path to the Excel file.
+        seasons_range (range): Range of seasons to export.
+        output_dir (str): Directory to save JSON files to.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    season_stats = {}
+    
+    # Read main stats
+    try:
+        stats_df = pd.read_excel(filename, sheet_name="Stats")
+        season_stats['total'] = stats_df.to_dict('records')
+    except Exception:
+        pass
+    
+    # Read season-specific stats
+    excel = pd.ExcelFile(filename)
+    for sheet in excel.sheet_names:
+        if sheet.endswith(" Stats") and sheet != "Stats":
+            year = sheet.replace(" Stats", "")
+            try:
+                season_df = pd.read_excel(filename, sheet_name=sheet)
+                season_stats[year] = season_df.to_dict('records')
+            except Exception:
+                continue
+    
+    # Clean NaN values
+    cleaned_season_stats = {}
+    for year, data in season_stats.items():
+        records = data if isinstance(data, list) else data.to_dict('records')
+        cleaned_records = []
+        for record in records:
+            cleaned_record = {}
+            for key, value in record.items():
+                if pd.isna(value):
+                    cleaned_record[key] = None
+                else:
+                    cleaned_record[key] = value
+            cleaned_records.append(cleaned_record)
+        cleaned_season_stats[year] = cleaned_records
+    
+    with open(output_path / "season_stats.json", "w") as f:
+        json.dump(cleaned_season_stats, f, indent=2)
+    
+    print(f"Exported season stats to {output_path / 'season_stats.json'}")
+
+
+def export_metadata_to_json(seasons_range: range, players_list: List[str], output_dir: str = "./data") -> None:
+    """Export metadata (seasons and players) for GitHub Pages.
+    
+    Args:
+        seasons_range (range): Range of seasons.
+        players_list (List[str]): List of all players.
+        output_dir (str): Directory to save JSON files to.
+    """
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    
+    metadata = {
+        "seasons": list(seasons_range),
+        "players": players_list,
+        "game_types": list(CONFIG["GAME_TYPES"].keys())
+    }
+    
+    with open(output_path / "metadata.json", "w") as f:
+        json.dump(metadata, f, indent=2)
+    
+    print(f"Exported metadata to {output_path / 'metadata.json'}")
+
+
+def export_all_data(filename: str, seasons_range: range, players_list: List[str], output_dir: str = "./data") -> None:
+    """Export all necessary data for GitHub Pages site.
+    
+    Args:
+        filename (str): Path to the Excel file.
+        seasons_range (range): Range of seasons.
+        players_list (List[str]): List of all players.
+        output_dir (str): Directory to save JSON files to.
+    """
+    print("\nExporting data for GitHub Pages...")
+    export_player_stats_to_json(filename, output_dir)
+    export_teams_to_json(filename, output_dir)
+    export_days_to_json(filename, output_dir)
+    export_season_stats_to_json(filename, seasons_range, output_dir)
+    export_metadata_to_json(seasons_range, players_list, output_dir)
+    print("All data exported successfully")
+
+
+
 def main() -> None:
     """Main program entry point - Processes field day data
     
     Returns:
         int: 0 for success, 1 for error
     """
+    global player_names
+    
     filename = CONFIG["EXCEL_FILE"]
+    
+    # Initialize player names and seasons from Excel file
+    try:
+        player_names = extract_player_names(filename)
+        CONFIG["SEASONS_RANGE"] = extract_seasons(filename)
+        print(f"Loaded {len(player_names)} players from Excel:")
+        print(", ".join(player_names))
+        print(f"Seasons: {min(CONFIG['SEASONS_RANGE'])} to {max(CONFIG['SEASONS_RANGE'])}")
+    except Exception as e:
+        print(f"Error initializing from Excel file: {e}")
+        return 1
     
     new_day = input("Do you want to add a new day? (y/n): ").strip().lower() in ['y', 'yes']
     
@@ -651,6 +950,9 @@ def main() -> None:
             active_players = get_active_players(yr_days)
             update_excel(filename, season, active_players)
             print(f"Processed {len(yr_days)} days for {season} season")
+        
+        # Export all data for GitHub Pages
+        export_all_data(filename, CONFIG["SEASONS_RANGE"], player_names)
     
     except Exception as e:
         print(f"Error: {str(e)}")
