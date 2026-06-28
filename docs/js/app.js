@@ -11,19 +11,42 @@ function getPlayerName(player) {
     return player.Name || player['Name '] || player['(Name)'] || '';
 }
 
-function formatPercentage(value) {
-    if (value === null || value === undefined || value === '' || value === '-') return '-';
-    if (typeof value === 'string') {
-        const trimmed = value.trim();
+function parseRecord(record) {
+    if (!record || record === '-') return null;
+    const match = String(record).trim().match(/^(\d+)\s*-\s*(\d+)$/);
+    if (!match) return null;
+    return { wins: parseInt(match[1], 10), losses: parseInt(match[2], 10) };
+}
+
+function hasRecordExperience(record) {
+    const parsed = parseRecord(record);
+    return parsed !== null && parsed.wins + parsed.losses > 0;
+}
+
+function formatStatPercentage(record, pct) {
+    if (!hasRecordExperience(record)) return '-';
+
+    if (pct === null || pct === undefined || pct === '') {
+        const parsed = parseRecord(record);
+        if (parsed) {
+            const total = parsed.wins + parsed.losses;
+            return `${((parsed.wins / total) * 100).toFixed(1)}%`;
+        }
+        return '-';
+    }
+
+    if (typeof pct === 'string') {
+        const trimmed = pct.trim();
         if (trimmed.endsWith('%')) return trimmed;
         const numeric = Number(trimmed);
         if (!Number.isNaN(numeric)) return `${(numeric * 100).toFixed(1)}%`;
         return trimmed;
     }
-    if (typeof value === 'number') {
-        if (value === 0) return '-';
-        return `${(value * 100).toFixed(1)}%`;
+
+    if (typeof pct === 'number') {
+        return `${(pct * 100).toFixed(1)}%`;
     }
+
     return '-';
 }
 
@@ -96,6 +119,32 @@ function populateSeasonDropdown() {
     });
 }
 
+function buildStatsRow(player) {
+    const name = getPlayerName(player);
+    return `
+        <td class="name-col name-col-first">${name}</td>
+        <td>${player['Days Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['Days Record'], player['Days Pct'])}</td>
+        <td>${player['Games Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['Games Record'], player['Games Pct'])}</td>
+        <td>${player["PK's Record"] || '-'}</td>
+        <td>${formatStatPercentage(player["PK's Record"], player["PK's Pct"])}</td>
+        <td>${player['Cross Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['Cross Record'], player['Cross Pct'])}</td>
+        <td>${player['A/D Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['A/D Record'], player['A/D Pct'])}</td>
+        <td>${player['P&F Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['P&F Record'], player['P&F Pct'])}</td>
+        <td>${player['SS Record'] || '-'}</td>
+        <td>${formatStatPercentage(player['SS Record'], player['SS Pct'])}</td>
+        <td>${player["FK's Record"] || '-'}</td>
+        <td>${formatStatPercentage(player["FK's Record"], player["FK's Pct"])}</td>
+        <td>${player.MVP || 0}</td>
+        <td>${player.Clown || 0}</td>
+        <td class="name-col name-col-last">${name}</td>
+    `;
+}
+
 // Render overall stats table
 function renderOverallStats() {
     const tbody = document.querySelector('#stats-table tbody');
@@ -103,28 +152,7 @@ function renderOverallStats() {
 
     allData.stats.forEach(player => {
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${getPlayerName(player)}</td>
-            <td>${player['Days Record'] || '-'}</td>
-            <td>${formatPercentage(player['Days Pct'])}</td>
-            <td>${player['Games Record'] || '-'}</td>
-            <td>${formatPercentage(player['Games Pct'])}</td>
-            <td>${player["PK's Record"] || '-'}</td>
-            <td>${formatPercentage(player["PK's Pct"])}</td>
-            <td>${player['Cross Record'] || '-'}</td>
-            <td>${formatPercentage(player['Cross Pct'])}</td>
-            <td>${player['A/D Record'] || '-'}</td>
-            <td>${formatPercentage(player['A/D Pct'])}</td>
-            <td>${player['P&F Record'] || '-'}</td>
-            <td>${formatPercentage(player['P&F Pct'])}</td>
-            <td>${player['SS Record'] || '-'}</td>
-            <td>${formatPercentage(player['SS Pct'])}</td>
-            <td>${player["FK's Record"] || '-'}</td>
-            <td>${formatPercentage(player["FK's Pct"])}</td>
-            <td>${player.MVP || 0}</td>
-            <td>${player.Clown || 0}</td>
-            <td>${getPlayerName(player)}</td>
-        `;
+        row.innerHTML = buildStatsRow(player);
         tbody.appendChild(row);
     });
 }
@@ -138,28 +166,7 @@ function renderSeasonStats(season) {
     
     seasonData.forEach(player => {
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${getPlayerName(player)}</td>
-            <td>${player['Days Record'] || '-'}</td>
-            <td>${formatPercentage(player['Days Pct'])}</td>
-            <td>${player['Games Record'] || '-'}</td>
-            <td>${formatPercentage(player['Games Pct'])}</td>
-            <td>${player["PK's Record"] || '-'}</td>
-            <td>${formatPercentage(player["PK's Pct"])}</td>
-            <td>${player['Cross Record'] || '-'}</td>
-            <td>${formatPercentage(player['Cross Pct'])}</td>
-            <td>${player['A/D Record'] || '-'}</td>
-            <td>${formatPercentage(player['A/D Pct'])}</td>
-            <td>${player['P&F Record'] || '-'}</td>
-            <td>${formatPercentage(player['P&F Pct'])}</td>
-            <td>${player['SS Record'] || '-'}</td>
-            <td>${formatPercentage(player['SS Pct'])}</td>
-            <td>${player["FK's Record"] || '-'}</td>
-            <td>${formatPercentage(player["FK's Pct"])}</td>
-            <td>${player.MVP || 0}</td>
-            <td>${player.Clown || 0}</td>
-            <td>${getPlayerName(player)}</td>
-        `;
+        row.innerHTML = buildStatsRow(player);
         tbody.appendChild(row);
     });
 }

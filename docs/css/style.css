@@ -143,6 +143,42 @@ tr:hover td {
     background-color: var(--background-color);
 }
 
+#stats-table th.name-col-first,
+#stats-table td.name-col-first,
+#season-stats-table th.name-col-first,
+#season-stats-table td.name-col-first {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background-color: white;
+}
+
+#stats-table th.name-col-last,
+#stats-table td.name-col-last,
+#season-stats-table th.name-col-last,
+#season-stats-table td.name-col-last {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background-color: white;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.06);
+}
+
+#stats-table th.name-col-first,
+#stats-table th.name-col-last,
+#season-stats-table th.name-col-first,
+#season-stats-table th.name-col-last {
+    background-color: var(--background-color);
+    z-index: 3;
+}
+
+#stats-table tr:hover td.name-col-first,
+#stats-table tr:hover td.name-col-last,
+#season-stats-table tr:hover td.name-col-first,
+#season-stats-table tr:hover td.name-col-last {
+    background-color: var(--background-color);
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
