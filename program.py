@@ -737,8 +737,6 @@ def export_player_stats_to_json(filename: str, output_dir: str = "./data") -> No
     with open(output_path / "stats.json", "w") as f:
         json.dump(cleaned_stats, f, indent=2)
     
-    print(f"Exported player stats to {output_path / 'stats.json'}")
-
 
 def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
     """Export teammate frequency data to JSON for GitHub Pages.
@@ -772,8 +770,6 @@ def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
     with open(output_path / "teams.json", "w") as f:
         json.dump(cleaned_teams, f, indent=2)
     
-    print(f"Exported teams data to {output_path / 'teams.json'}")
-
 
 def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
     """Export game history (days) to JSON for GitHub Pages.
@@ -821,8 +817,6 @@ def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
     with open(output_path / "days.json", "w") as f:
         json.dump(cleaned_days, f, indent=2)
     
-    print(f"Exported days data to {output_path / 'days.json'}")
-
 
 def export_season_stats_to_json(filename: str, seasons_range: range, output_dir: str = "./data") -> None:
     """Export season-specific statistics to JSON for GitHub Pages.
@@ -873,8 +867,6 @@ def export_season_stats_to_json(filename: str, seasons_range: range, output_dir:
     with open(output_path / "season_stats.json", "w") as f:
         json.dump(cleaned_season_stats, f, indent=2)
     
-    print(f"Exported season stats to {output_path / 'season_stats.json'}")
-
 
 def export_metadata_to_json(seasons_range: range, players_list: List[str], output_dir: str = "./data") -> None:
     """Export metadata (seasons and players) for GitHub Pages.
@@ -895,9 +887,7 @@ def export_metadata_to_json(seasons_range: range, players_list: List[str], outpu
     
     with open(output_path / "metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
-    
-    print(f"Exported metadata to {output_path / 'metadata.json'}")
-
+        
 
 def export_all_data(filename: str, seasons_range: range, players_list: List[str], output_dir: str = "./docs/data") -> None:
     """Export all necessary data for GitHub Pages site.
