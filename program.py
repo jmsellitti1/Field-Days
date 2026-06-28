@@ -734,6 +734,10 @@ def export_player_stats_to_json(filename: str, output_dir: str = "./data") -> No
                 cleaned_record[key] = value
         cleaned_stats.append(cleaned_record)
     
+    # Add another name column at the end
+    for record in cleaned_stats:
+        record['(Name)'] = record.get('Name', None)
+    
     with open(output_path / "stats.json", "w") as f:
         json.dump(cleaned_stats, f, indent=2)
     
@@ -761,8 +765,12 @@ def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
             continue
         cleaned_record = {}
         for key, value in record.items():
+            if key == "Player B":
+                continue
             if pd.isna(value):
                 cleaned_record[key] = None
+            elif isinstance(value, (int, float)):
+                cleaned_record[key] = f"{value * 100:.2f}%"
             else:
                 cleaned_record[key] = value
         cleaned_teams.append(cleaned_record)
@@ -818,7 +826,7 @@ def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
         json.dump(cleaned_days, f, indent=2)
     
 
-def export_season_stats_to_json(filename: str, seasons_range: range, output_dir: str = "./data") -> None:
+def export_season_stats_to_json(filename: str, output_dir: str = "./data") -> None:
     """Export season-specific statistics to JSON for GitHub Pages.
     
     Args:
@@ -902,7 +910,7 @@ def export_all_data(filename: str, seasons_range: range, players_list: List[str]
     export_player_stats_to_json(filename, output_dir)
     export_teams_to_json(filename, output_dir)
     export_days_to_json(filename, output_dir)
-    export_season_stats_to_json(filename, seasons_range, output_dir)
+    export_season_stats_to_json(filename, output_dir)
     export_metadata_to_json(seasons_range, players_list, output_dir)
     print("All data exported successfully")
 
