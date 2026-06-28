@@ -7,6 +7,41 @@ let allData = {
     metadata: {}
 };
 
+function getPlayerName(player) {
+    return player['(Name)'] || player.Name || player['Name '] || '';
+}
+
+function formatPercentage(value) {
+    if (value === null || value === undefined || value === '' || value === '-') return '-';
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.endsWith('%')) return trimmed;
+        const numeric = Number(trimmed);
+        if (!Number.isNaN(numeric)) return `${(numeric * 100).toFixed(1)}%`;
+        return trimmed;
+    }
+    if (typeof value === 'number') {
+        if (value === 0) return '-';
+        return `${(value * 100).toFixed(1)}%`;
+    }
+    return '-';
+}
+
+function formatTeamFrequency(value) {
+    if (value === null || value === undefined || value === '' || value === '-') return '-';
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.endsWith('%')) return trimmed;
+        const numeric = Number(trimmed);
+        if (!Number.isNaN(numeric)) return `${(numeric * 100).toFixed(1)}%`;
+        return trimmed;
+    }
+    if (typeof value === 'number') {
+        return `${(value * 100).toFixed(1)}%`;
+    }
+    return value;
+}
+
 // Load all data from JSON files
 async function loadData() {
     try {
@@ -69,7 +104,7 @@ function renderOverallStats() {
     allData.stats.forEach(player => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${player.Name || ''}</td>
+            <td>${getPlayerName(player)}</td>
             <td>${player['Days Record'] || '-'}</td>
             <td>${formatPercentage(player['Days Pct'])}</td>
             <td>${player['Games Record'] || '-'}</td>
@@ -103,7 +138,7 @@ function renderSeasonStats(season) {
     seasonData.forEach(player => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${player.Name || ''}</td>
+            <td>${getPlayerName(player)}</td>
             <td>${player['Days Record'] || '-'}</td>
             <td>${formatPercentage(player['Days Pct'])}</td>
             <td>${player['Games Record'] || '-'}</td>
@@ -136,7 +171,7 @@ function renderTeams() {
         return;
     }
 
-    const players = Object.keys(allData.teams[0] || {}).filter(key => key !== 'Name');
+    const players = Object.keys(allData.teams[0] || {}).filter(key => !['Name', '(Name)', 'Player A', 'Player B'].includes(key));
     
     // Create header
     const thead = container.querySelector('thead');
@@ -158,7 +193,7 @@ function renderTeams() {
         players.forEach(player => {
             const value = row[player];
             const cellClass = playerName === player ? 'same-player combination-cell' : 'combination-cell';
-            rowHTML += `<td class="${cellClass}">${value !== null && value !== undefined ? value : '-'}</td>`;
+            rowHTML += `<td class="${cellClass}">${value !== null && value !== undefined ? formatTeamFrequency(value) : '-'}</td>`;
         });
         
         rowHTML += '</tr>';
@@ -198,12 +233,6 @@ function renderDays() {
         `;
         tbody.appendChild(row);
     });
-}
-
-// Utility function to format percentages
-function formatPercentage(value) {
-    if (value === null || value === undefined || value === 0) return '-';
-    return (value * 100).toFixed(1) + '%';
 }
 
 // Navigation buttons
