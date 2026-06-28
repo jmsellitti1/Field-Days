@@ -8,7 +8,7 @@ let allData = {
 };
 
 function getPlayerName(player) {
-    return player['(Name)'] || player.Name || player['Name '] || '';
+    return player.Name || player['Name '] || player['(Name)'] || '';
 }
 
 function formatPercentage(value) {
@@ -123,6 +123,7 @@ function renderOverallStats() {
             <td>${formatPercentage(player["FK's Pct"])}</td>
             <td>${player.MVP || 0}</td>
             <td>${player.Clown || 0}</td>
+            <td>${getPlayerName(player)}</td>
         `;
         tbody.appendChild(row);
     });
@@ -157,6 +158,7 @@ function renderSeasonStats(season) {
             <td>${formatPercentage(player["FK's Pct"])}</td>
             <td>${player.MVP || 0}</td>
             <td>${player.Clown || 0}</td>
+            <td>${getPlayerName(player)}</td>
         `;
         tbody.appendChild(row);
     });
