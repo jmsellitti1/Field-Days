@@ -658,7 +658,11 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
         PermissionError: If Excel file is locked for editing.
     """
     stats = pd.read_excel(filename, sheet_name="Stats")
-    teams = pd.read_excel(filename, sheet_name="Teams")
+
+    # Build the combinations grid from the source player list on every run.
+    team_names = sorted(player_names, key=str.casefold)
+    teams = pd.DataFrame(0.0, index=team_names, columns=team_names)
+    teams.index.name = "Name"
     
     if active_players is not None:
         sorted_players = active_players
@@ -700,14 +704,16 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
         if not season:
             for teammate in player.teammates.items():
                 stats_days_total = days_wins + days_losses
-                teams.at[idx, teammate[0]] = round(teammate[1] / stats_days_total, 3) if stats_days_total > 0 else 0
+                teams.at[player.name, teammate[0]] = round(teammate[1] / stats_days_total, 3) if stats_days_total > 0 else 0
 
-    with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
-        if season:
+    if season:
+        with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
             stats.iloc[:len(filtered_players)].to_excel(writer, sheet_name=str(season) + ' Stats', index=False, startrow=0, startcol=0)
-        else:
+    else:
+        with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
             stats.to_excel(writer, sheet_name='Stats', index=False, startrow=0, startcol=0)
-            teams.to_excel(writer, sheet_name='Teams', index=False, startrow=0, startcol=0)
+        with pd.ExcelWriter(filename, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+            teams.reset_index().to_excel(writer, sheet_name='Teams', index=False)
 
 
 # JSON EXPORT FUNCTIONS
@@ -735,7 +741,7 @@ def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
             continue
         cleaned_record = {}
         for key, value in record.items():
-            if key == "Player B":
+            if key != 'Name' and key not in player_names:
                 continue
             if pd.isna(value):
                 cleaned_record[key] = None

@@ -111,7 +111,7 @@
                                 <th class="corner-header">Players</th>
                                 {% set players = [] %}
                                 {% for row in teams %}
-                                    {% if row.Name and row.Name|string not in players and row.Name not in ["Frequency of Players A and B being on the same team (As a percentage of days that Player A has played)", "Player A", "nan", "NaN"] %}
+                                    {% if row.Name and row.Name|string not in players and row.Name not in ["Frequency of Players A (Row) and B (Column) being on the same team (As a percentage of days that Player A has played)", "nan", "NaN"] %}
                                         {% set _ = players.append(row.Name|string) %}
                                     {% endif %}
                                 {% endfor %}
@@ -153,7 +153,7 @@
                     </table>
                 </div>
                 <div class="team-combinations-caption">
-                    Frequency of players being on the same team (As a percentage of days that the player in the vertical list has played)
+                    Frequency of Players A (Row) and B (Column)being on the same team (As a percentage of days that Player A has played)
                 </div>
             </section>
 

@@ -10,6 +10,19 @@ function getPlayerName(player) {
     return player.Name || player['Name '] || player['(Name)'] || '';
 }
 
+function getPlayers() {
+    if (allData.metadata?.players?.length) {
+        return allData.metadata.players;
+    }
+    return allData.teams
+        .map(row => getPlayerName(row))
+        .filter(Boolean);
+}
+
+function getTeamRow(player) {
+    return allData.teams.find(row => getPlayerName(row) === player);
+}
+
 function parseRecord(record) {
     if (!record || record === '-') return null;
     const match = String(record).trim().match(/^(\d+)\s*-\s*(\d+)$/);
@@ -158,40 +171,33 @@ function renderSeasonStats(season) {
 // Render teams table
 function renderTeams() {
     const container = document.querySelector('#teams-table');
-    
-    if (!allData.teams || allData.teams.length === 0) {
-        container.innerHTML = '<tr><td>No team data available</td></tr>';
+    const thead = container.querySelector('thead');
+    const tbody = container.querySelector('tbody');
+
+    const players = getPlayers();
+    if (!players.length) {
+        thead.innerHTML = '';
+        tbody.innerHTML = '<tr><td>No team data available</td></tr>';
         return;
     }
 
-    const players = Object.keys(allData.teams[0] || {}).filter(key => !['Name', '(Name)', 'Player A', 'Player B'].includes(key));
-    
-    // Create header
-    const thead = container.querySelector('thead');
-    let headerHTML = '<tr><th class="corner-header">Players</th>';
-    players.forEach(player => {
-        headerHTML += `<th class="player-header">${player}</th>`;
-    });
-    headerHTML += '</tr>';
-    thead.innerHTML = headerHTML;
+    thead.innerHTML = `
+        <tr>
+            <th class="corner-header">Players</th>
+            ${players.map(player => `<th class="player-header">${player}</th>`).join('')}
+        </tr>
+    `;
 
-    // Create body
-    const tbody = container.querySelector('tbody');
-    tbody.innerHTML = '';
-    
-    allData.teams.forEach(row => {
-        const playerName = row.Name || '';
-        let rowHTML = `<tr><td class="player-header">${playerName}</td>`;
-        
-        players.forEach(player => {
-            const value = row[player];
-            const cellClass = playerName === player ? 'same-player combination-cell' : 'combination-cell';
-            rowHTML += `<td class="${cellClass}">${value !== null && value !== undefined ? formatTeamFrequency(value) : '-'}</td>`;
-        });
-        
-        rowHTML += '</tr>';
-        tbody.innerHTML += rowHTML;
-    });
+    tbody.innerHTML = players.map(rowPlayer => {
+        const row = getTeamRow(rowPlayer);
+        const cells = players.map(colPlayer => {
+            const value = row?.[colPlayer];
+            const cellClass = rowPlayer === colPlayer ? 'same-player combination-cell' : 'combination-cell';
+            const display = value !== null && value !== undefined ? formatTeamFrequency(value) : '-';
+            return `<td class="${cellClass}">${display}</td>`;
+        }).join('');
+        return `<tr><td class="player-header">${rowPlayer}</td>${cells}</tr>`;
+    }).join('');
 }
 
 // Render days/game history table
