@@ -14,6 +14,8 @@ The module supports:
 
 Usage:
     python program.py
+    cd docs && python3 -m http.server 8000 # for local testing of github pages deployment
+    http://localhost:8000
 """
 
 # Configuration constants
@@ -710,38 +712,6 @@ def update_excel(filename: str, season: Optional[int] = None, active_players: Op
 
 # JSON EXPORT FUNCTIONS
 
-def export_player_stats_to_json(filename: str, output_dir: str = "./data") -> None:
-    """Export overall player statistics to JSON for GitHub Pages.
-    
-    Args:
-        filename (str): Path to the Excel file.
-        output_dir (str): Directory to save JSON files to.
-    """
-    output_path = Path(output_dir)
-    output_path.mkdir(exist_ok=True)
-    
-    stats = pd.read_excel(filename, sheet_name="Stats")
-    stats_data = stats.to_dict('records')
-    
-    # Clean NaN values
-    cleaned_stats = []
-    for record in stats_data:
-        cleaned_record = {}
-        for key, value in record.items():
-            if pd.isna(value):
-                cleaned_record[key] = None
-            else:
-                cleaned_record[key] = value
-        cleaned_stats.append(cleaned_record)
-    
-    # Add another name column at the end
-    for record in cleaned_stats:
-        record['(Name)'] = record.get('Name', None)
-    
-    with open(output_path / "stats.json", "w") as f:
-        json.dump(cleaned_stats, f, indent=2)
-    
-
 def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
     """Export teammate frequency data to JSON for GitHub Pages.
     
@@ -907,7 +877,6 @@ def export_all_data(filename: str, seasons_range: range, players_list: List[str]
         output_dir (str): Directory to save JSON files to.
     """
     print("\nExporting data for GitHub Pages...")
-    export_player_stats_to_json(filename, output_dir)
     export_teams_to_json(filename, output_dir)
     export_days_to_json(filename, output_dir)
     export_season_stats_to_json(filename, output_dir)

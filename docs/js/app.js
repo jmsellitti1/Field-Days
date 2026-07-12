@@ -1,6 +1,5 @@
 // Global data storage
 let allData = {
-    stats: [],
     seasons: {},
     teams: [],
     days: [],
@@ -69,28 +68,24 @@ function formatTeamFrequency(value) {
 async function loadData() {
     try {
         const dataPath = './data/';
-        const [statsRes, teamsRes, daysRes, seasonStatsRes, metadataRes] = await Promise.all([
-            fetch(`${dataPath}stats.json`),
+        const [teamsRes, daysRes, seasonStatsRes, metadataRes] = await Promise.all([
             fetch(`${dataPath}teams.json`),
             fetch(`${dataPath}days.json`),
             fetch(`${dataPath}season_stats.json`),
             fetch(`${dataPath}metadata.json`)
         ]);
 
-        if (!statsRes.ok) throw new Error(`Failed to load stats: ${statsRes.status}`);
         if (!teamsRes.ok) throw new Error(`Failed to load teams: ${teamsRes.status}`);
         if (!daysRes.ok) throw new Error(`Failed to load days: ${daysRes.status}`);
         if (!seasonStatsRes.ok) throw new Error(`Failed to load season stats: ${seasonStatsRes.status}`);
         if (!metadataRes.ok) throw new Error(`Failed to load metadata: ${metadataRes.status}`);
 
-        allData.stats = await statsRes.json();
         allData.teams = await teamsRes.json();
         allData.days = await daysRes.json();
         allData.seasons = await seasonStatsRes.json();
         allData.metadata = await metadataRes.json();
 
         populateSeasonDropdown();
-        renderOverallStats();
         renderTeams();
         renderDays();
         renderSeasonStats('total');
@@ -119,6 +114,7 @@ function populateSeasonDropdown() {
     });
 }
 
+
 function buildStatsRow(player) {
     const name = getPlayerName(player);
     return `
@@ -143,18 +139,6 @@ function buildStatsRow(player) {
         <td>${player.Clown || 0}</td>
         <td class="name-col name-col-last">${name}</td>
     `;
-}
-
-// Render overall stats table
-function renderOverallStats() {
-    const tbody = document.querySelector('#stats-table tbody');
-    tbody.innerHTML = '';
-
-    allData.stats.forEach(player => {
-        const row = document.createElement('tr');
-        row.innerHTML = buildStatsRow(player);
-        tbody.appendChild(row);
-    });
 }
 
 // Render season stats
