@@ -746,7 +746,7 @@ def export_teams_to_json(filename: str, output_dir: str = "./data") -> None:
             if pd.isna(value):
                 cleaned_record[key] = None
             elif isinstance(value, (int, float)):
-                cleaned_record[key] = f"{value * 100:.2f}%"
+                cleaned_record[key] = f"{value * 100:.1f}%"
             else:
                 cleaned_record[key] = value
         cleaned_teams.append(cleaned_record)
