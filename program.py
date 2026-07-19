@@ -13,7 +13,7 @@ The module supports:
 - Season-based record keeping
 
 Usage:
-    python program.py
+    python3 program.py
     cd docs && python3 -m http.server 8000 # for local testing of github pages deployment
     http://localhost:8000
 """
@@ -882,7 +882,6 @@ def export_all_data(filename: str, seasons_range: range, players_list: List[str]
         players_list (List[str]): List of all players.
         output_dir (str): Directory to save JSON files to.
     """
-    print("\nExporting data for GitHub Pages...")
     export_teams_to_json(filename, output_dir)
     export_days_to_json(filename, output_dir)
     export_season_stats_to_json(filename, output_dir)

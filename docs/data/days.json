@@ -1,6 +1,22 @@
 [
   {
     "year": 2026,
+    "Date": "07/19/2026",
+    "Team 1": "Jacob, Kiernan, Sam S, Anthony, Quinn",
+    "Team 2": "Brandon, Eric, Sam G, AB, Aaron",
+    "Score": "2-4",
+    "Game 1": "PK's (1-3)",
+    "Game 2": "Cross (0-3)",
+    "Game 3": "A/D (0-1)",
+    "Game 4": "P&F (1-0)",
+    "Game 5": "FK's (1-0)",
+    "Game 6": "Cross (1-2)",
+    "Game 7": null,
+    "MVP": "Sam G",
+    "Clown of the Match": "Jacob"
+  },
+  {
+    "year": 2026,
     "Date": "07/11/2026",
     "Team 1": "Jacob, Brandon, Eric, Joe",
     "Team 2": "Kiernan, Sam G, Aaron",
