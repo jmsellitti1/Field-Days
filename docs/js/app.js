@@ -1,256 +1,285 @@
-// Global data storage
-let allData = {
+const allData = {
     seasons: {},
     teams: [],
     days: [],
-    metadata: {}
+    metadata: {},
+    rankings: {},
 };
+
+let activeGame = null;
 
 function getPlayerName(player) {
     return player.Name || player['Name '] || player['(Name)'] || '';
 }
 
 function getPlayers() {
-    if (allData.metadata?.players?.length) {
-        return allData.metadata.players;
-    }
-    return allData.teams
-        .map(row => getPlayerName(row))
-        .filter(Boolean);
-}
-
-function getTeamRow(player) {
-    return allData.teams.find(row => getPlayerName(row) === player);
+    return allData.metadata.players?.length
+        ? allData.metadata.players
+        : allData.teams.map(getPlayerName).filter(Boolean);
 }
 
 function parseRecord(record) {
-    if (!record || record === '-') return null;
-    const match = String(record).trim().match(/^(\d+)\s*-\s*(\d+)$/);
-    if (!match) return null;
-    return { wins: parseInt(match[1], 10), losses: parseInt(match[2], 10) };
+    if (!record) return null;
+    const match = String(record).match(/^(\d+)\s*-\s*(\d+)$/);
+    return match ? { wins: Number(match[1]), losses: Number(match[2]) } : null;
 }
 
-function hasRecordExperience(record) {
+function formatPercentage(record, percentage) {
     const parsed = parseRecord(record);
-    return parsed !== null && parsed.wins + parsed.losses > 0;
+    if (!parsed || parsed.wins + parsed.losses === 0) return '-';
+    if (typeof percentage === 'number') return `${(percentage * 100).toFixed(1)}%`;
+    if (typeof percentage === 'string' && percentage.trim()) {
+        const numeric = Number(percentage);
+        return Number.isNaN(numeric) ? percentage : `${(numeric * 100).toFixed(1)}%`;
+    }
+    return `${(parsed.wins / (parsed.wins + parsed.losses) * 100).toFixed(1)}%`;
 }
-
-function formatStatPercentage(record, pct) {
-    if (!hasRecordExperience(record)) return '-';
-
-    if (pct === null || pct === undefined || pct === '') {
-        const parsed = parseRecord(record);
-        if (parsed) {
-            const total = parsed.wins + parsed.losses;
-            return `${((parsed.wins / total) * 100).toFixed(1)}%`;
-        }
-        return '-';
-    }
-
-    if (typeof pct === 'string') {
-        const trimmed = pct.trim();
-        if (trimmed.endsWith('%')) return trimmed;
-        const numeric = Number(trimmed);
-        if (!Number.isNaN(numeric)) return `${(numeric * 100).toFixed(1)}%`;
-        return trimmed;
-    }
-
-    if (typeof pct === 'number') {
-        return `${(pct * 100).toFixed(1)}%`;
-    }
-
-    return '-';
-}
-
-function formatTeamFrequency(value) {
-    if (value === null || value === undefined || value === '' || value === '-') return '-';
-    if (typeof value === 'string') {
-        const trimmed = value.trim();
-        if (trimmed.endsWith('%')) return trimmed;
-        const numeric = Number(trimmed);
-        if (!Number.isNaN(numeric)) return `${(numeric * 100).toFixed(1)}%`;
-        return trimmed;
-    }
-    if (typeof value === 'number') {
-        return `${(value * 100).toFixed(1)}%`;
-    }
-    return value;
-}
-
-// Load all data from JSON files
-async function loadData() {
-    try {
-        const dataPath = './data/';
-        const [teamsRes, daysRes, seasonStatsRes, metadataRes] = await Promise.all([
-            fetch(`${dataPath}teams.json`),
-            fetch(`${dataPath}days.json`),
-            fetch(`${dataPath}season_stats.json`),
-            fetch(`${dataPath}metadata.json`)
-        ]);
-
-        if (!teamsRes.ok) throw new Error(`Failed to load teams: ${teamsRes.status}`);
-        if (!daysRes.ok) throw new Error(`Failed to load days: ${daysRes.status}`);
-        if (!seasonStatsRes.ok) throw new Error(`Failed to load season stats: ${seasonStatsRes.status}`);
-        if (!metadataRes.ok) throw new Error(`Failed to load metadata: ${metadataRes.status}`);
-
-        allData.teams = await teamsRes.json();
-        allData.days = await daysRes.json();
-        allData.seasons = await seasonStatsRes.json();
-        allData.metadata = await metadataRes.json();
-
-        populateSeasonDropdown();
-        renderTeams();
-        renderDays();
-        renderSeasonStats('total');
-    } catch (error) {
-        console.error('Error loading data:', error);
-        document.body.innerHTML = `<div class="container"><p style="color: red; margin-top: 2rem;">Error loading data: ${error.message}</p></div>`;
-    }
-}
-
-// Populate season dropdown
-function populateSeasonDropdown() {
-    const select = document.getElementById('season-select');
-    select.innerHTML = '<option value="total">All Time</option>';
-    
-    if (allData.metadata.seasons) {
-        allData.metadata.seasons.forEach(season => {
-            const option = document.createElement('option');
-            option.value = season;
-            option.textContent = `${season} Season`;
-            select.appendChild(option);
-        });
-    }
-    
-    select.addEventListener('change', (e) => {
-        renderSeasonStats(e.target.value);
-    });
-}
-
 
 function buildStatsRow(player) {
     const name = getPlayerName(player);
     return `
         <td class="name-col name-col-first">${name}</td>
         <td>${player['Days Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['Days Record'], player['Days Pct'])}</td>
+        <td>${formatPercentage(player['Days Record'], player['Days Pct'])}</td>
         <td>${player['Games Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['Games Record'], player['Games Pct'])}</td>
+        <td>${formatPercentage(player['Games Record'], player['Games Pct'])}</td>
         <td>${player["PK's Record"] || '-'}</td>
-        <td>${formatStatPercentage(player["PK's Record"], player["PK's Pct"])}</td>
+        <td>${formatPercentage(player["PK's Record"], player["PK's Pct"])}</td>
         <td>${player['Cross Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['Cross Record'], player['Cross Pct'])}</td>
+        <td>${formatPercentage(player['Cross Record'], player['Cross Pct'])}</td>
         <td>${player['A/D Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['A/D Record'], player['A/D Pct'])}</td>
+        <td>${formatPercentage(player['A/D Record'], player['A/D Pct'])}</td>
         <td>${player['P&F Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['P&F Record'], player['P&F Pct'])}</td>
+        <td>${formatPercentage(player['P&F Record'], player['P&F Pct'])}</td>
         <td>${player['SS Record'] || '-'}</td>
-        <td>${formatStatPercentage(player['SS Record'], player['SS Pct'])}</td>
+        <td>${formatPercentage(player['SS Record'], player['SS Pct'])}</td>
         <td>${player["FK's Record"] || '-'}</td>
-        <td>${formatStatPercentage(player["FK's Record"], player["FK's Pct"])}</td>
+        <td>${formatPercentage(player["FK's Record"], player["FK's Pct"])}</td>
         <td>${player.MVP || 0}</td>
         <td>${player.Clown || 0}</td>
         <td class="name-col name-col-last">${name}</td>
     `;
 }
 
-// Render season stats
+async function loadData() {
+    try {
+        const base = './data/';
+        const [teamsRes, daysRes, seasonRes, metadataRes, rankingsRes] = await Promise.all([
+            fetch(`${base}teams.json`),
+            fetch(`${base}days.json`),
+            fetch(`${base}season_stats.json`),
+            fetch(`${base}metadata.json`),
+            fetch(`${base}rankings.json`),
+        ]);
+
+        for (const [name, response] of [
+            ['teams', teamsRes], ['days', daysRes], ['season stats', seasonRes],
+            ['metadata', metadataRes], ['rankings', rankingsRes],
+        ]) {
+            if (!response.ok) throw new Error(`Failed to load ${name}: ${response.status}`);
+        }
+
+        allData.teams = await teamsRes.json();
+        allData.days = await daysRes.json();
+        allData.seasons = await seasonRes.json();
+        allData.metadata = await metadataRes.json();
+        allData.rankings = await rankingsRes.json();
+
+        populateSeasonSelects();
+        renderSeasonStats('total');
+        renderRankings('total');
+        renderTeams();
+        renderDays();
+        renderGameControls();
+        renderGameStats();
+    } catch (error) {
+        document.body.innerHTML = `<div class="container"><p style="color:red">Error loading data: ${error.message}</p></div>`;
+    }
+}
+
+function populateSeasonSelects() {
+    const seasons = allData.metadata.seasons || [];
+    const seasonSelect = document.getElementById('season-select');
+    const gameSeasonSelect = document.getElementById('game-season-select');
+    const rankingSeasonSelect = document.getElementById('ranking-season-select');
+
+    for (const season of seasons) {
+        seasonSelect.add(new Option(`${season} Season`, season));
+        gameSeasonSelect.add(new Option(`${season} Season`, season));
+        rankingSeasonSelect.add(new Option(`${season} Season`, season));
+    }
+
+    seasonSelect.addEventListener('change', event => renderSeasonStats(event.target.value));
+    rankingSeasonSelect.addEventListener('change', event => renderRankings(event.target.value));
+    gameSeasonSelect.addEventListener('change', renderGameStats);
+}
+
 function renderSeasonStats(season) {
     const tbody = document.querySelector('#season-stats-table tbody');
     tbody.innerHTML = '';
-
-    const seasonData = allData.seasons[season] || [];
-    
-    seasonData.forEach(player => {
+    for (const player of allData.seasons[season] || []) {
         const row = document.createElement('tr');
         row.innerHTML = buildStatsRow(player);
         tbody.appendChild(row);
-    });
+    }
 }
 
-// Render teams table
-function renderTeams() {
-    const container = document.querySelector('#teams-table');
-    const thead = container.querySelector('thead');
-    const tbody = container.querySelector('tbody');
-
-    const players = getPlayers();
-    if (!players.length) {
-        thead.innerHTML = '';
-        tbody.innerHTML = '<tr><td>No team data available</td></tr>';
-        return;
+function renderRankings(season) {
+    const tbody = document.querySelector('#rankings-table tbody');
+    tbody.innerHTML = '';
+    for (const player of allData.rankings[season] || []) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${player.rank}</td>
+            <td>${player.name}</td>
+            <td>${player.score.toFixed(1)}</td>
+            <td>${player.average_opponent_rating}</td>
+            <td>${player.day_record} (${player.days} days)</td>
+            <td>${player.day_pct.toFixed(1)}%</td>
+            <td>${player.game_pct.toFixed(1)}%</td>
+            <td>${player.mvp}</td>
+            <td>${player.clown}</td>
+        `;
+        tbody.appendChild(row);
     }
+}
 
-    thead.innerHTML = `
-        <tr>
-            <th class="corner-header">Players</th>
-            ${players.map(player => `<th class="player-header">${player}</th>`).join('')}
-        </tr>
-    `;
+function getTeamRow(player) {
+    return allData.teams.find(row => getPlayerName(row) === player);
+}
 
+function formatTeamFrequency(value) {
+    if (value === null || value === undefined || value === '') return '-';
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (trimmed.endsWith('%')) return trimmed;
+        const numeric = Number(trimmed);
+        return Number.isNaN(numeric) ? trimmed : `${(numeric * 100).toFixed(1)}%`;
+    }
+    return typeof value === 'number' ? `${(value * 100).toFixed(1)}%` : '-';
+}
+
+function renderTeams() {
+    const players = getPlayers();
+    const thead = document.querySelector('#teams-table thead');
+    const tbody = document.querySelector('#teams-table tbody');
+    thead.innerHTML = `<tr><th class="corner-header">Players</th>${players.map(player => `<th class="player-header">${player}</th>`).join('')}</tr>`;
     tbody.innerHTML = players.map(rowPlayer => {
         const row = getTeamRow(rowPlayer);
         const cells = players.map(colPlayer => {
             const value = row?.[colPlayer];
-            const cellClass = rowPlayer === colPlayer ? 'same-player combination-cell' : 'combination-cell';
-            const display = value !== null && value !== undefined ? formatTeamFrequency(value) : '-';
-            return `<td class="${cellClass}">${display}</td>`;
+            const display = formatTeamFrequency(value);
+            return `<td class="${rowPlayer === colPlayer ? 'same-player combination-cell' : 'combination-cell'}">${display}</td>`;
         }).join('');
         return `<tr><td class="player-header">${rowPlayer}</td>${cells}</tr>`;
     }).join('');
 }
 
-// Render days/game history table
 function renderDays() {
     const tbody = document.querySelector('#days-table tbody');
     tbody.innerHTML = '';
-
-    allData.days.forEach(day => {
+    for (const day of allData.days) {
+        const games = Array.from({ length: 10 }, (_, index) => day[`Game ${index + 1}`])
+            .filter(Boolean)
+            .join('<br>');
         const row = document.createElement('tr');
-        
-        let gamesHTML = '';
-        if (day.Game) {
-            gamesHTML = day.Game;
-        } else {
-            // Try to construct from individual game columns
-            for (let i = 1; i <= 10; i++) {
-                const gameCol = `Game ${i}`;
-                if (day[gameCol]) {
-                    gamesHTML += (gamesHTML ? '<br>' : '') + day[gameCol];
-                }
-            }
-        }
-
         row.innerHTML = `
             <td>${day.Date || '-'}</td>
             <td>${day['Team 1'] || '-'}</td>
             <td>${day['Team 2'] || '-'}</td>
             <td>${day.Score || '-'}</td>
-            <td><small>${gamesHTML ? gamesHTML.replace(/\n/g, '<br>') : '-'}</small></td>
+            <td><small>${games || '-'}</small></td>
             <td>${day.MVP || '-'}</td>
             <td>${day['Clown of the Match'] || '-'}</td>
         `;
         tbody.appendChild(row);
+    }
+}
+
+function gameNames() {
+    const names = new Set();
+    for (const day of allData.days) {
+        for (let index = 1; index <= 10; index++) {
+            const game = day[`Game ${index}`];
+            if (game) {
+                const match = String(game).match(/^(.+?) \(\d+-\d+\)$/);
+                if (match) names.add(match[1]);
+            }
+        }
+    }
+    return [...names].sort();
+}
+
+function renderGameControls() {
+    const container = document.getElementById('game-button-list');
+    const names = gameNames();
+    activeGame = names[0] || null;
+    container.innerHTML = names.map(name =>
+        `<button class="game-button${name === activeGame ? ' active' : ''}" data-game="${name}">${name}</button>`
+    ).join('');
+    container.addEventListener('click', event => {
+        const button = event.target.closest('.game-button');
+        if (!button) return;
+        activeGame = button.dataset.game;
+        container.querySelectorAll('.game-button').forEach(item =>
+            item.classList.toggle('active', item === button)
+        );
+        renderGameStats();
     });
 }
 
-// Navigation buttons
+function renderGameStats() {
+    if (!activeGame) return;
+    const season = document.getElementById('game-season-select').value;
+    const stats = {};
+
+    for (const day of allData.days) {
+        if (season !== 'total' && String(day.year) !== season) continue;
+        const team1 = String(day['Team 1'] || '').split(',').map(name => name.trim()).filter(Boolean);
+        const team2 = String(day['Team 2'] || '').split(',').map(name => name.trim()).filter(Boolean);
+
+        for (let index = 1; index <= 10; index++) {
+            const game = day[`Game ${index}`];
+            const match = String(game || '').match(/^(.+?) \((\d+)-(\d+)\)$/);
+            if (!match || match[1] !== activeGame) continue;
+            const score1 = Number(match[2]);
+            const score2 = Number(match[3]);
+
+            for (const name of team1) {
+                const row = stats[name] ||= { wins: 0, losses: 0 };
+                row.wins += score1;
+                row.losses += score2;
+            }
+            for (const name of team2) {
+                const row = stats[name] ||= { wins: 0, losses: 0 };
+                row.wins += score2;
+                row.losses += score1;
+            }
+        }
+    }
+
+    const rows = Object.entries(stats)
+        .map(([name, record]) => ({ name, ...record }))
+        .filter(row => row.wins + row.losses > 0)
+        .sort((a, b) =>
+            (b.wins / (b.wins + b.losses)) - (a.wins / (a.wins + a.losses))
+        );
+
+    const tbody = document.querySelector('#game-stats-table tbody');
+    tbody.innerHTML = rows.length ? rows.map(row => {
+        const total = row.wins + row.losses;
+        return `<tr><td>${row.name}</td><td>${row.wins}-${row.losses}</td><td>${(row.wins / total * 100).toFixed(1)}%</td></tr>`;
+    }).join('') : '<tr><td colspan="3">No data available</td></tr>';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    const navButtons = document.querySelectorAll('.nav-btn');
-    
-    navButtons.forEach(button => {
+    document.querySelectorAll('.nav-btn').forEach(button => {
         button.addEventListener('click', () => {
-            // Remove active class from all buttons and sections
-            navButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(item => item.classList.remove('active'));
             document.querySelectorAll('section').forEach(section => section.classList.remove('active'));
-            
-            // Add active class to clicked button and corresponding section
             button.classList.add('active');
-            const sectionId = button.getAttribute('data-section');
-            document.getElementById(sectionId).classList.add('active');
+            document.getElementById(button.dataset.section).classList.add('active');
         });
     });
-
-    // Load all data on page load
     loadData();
 });

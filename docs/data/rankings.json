@@ -1,0 +1,2599 @@
+{
+  "total": [
+    {
+      "name": "Brandon",
+      "score": 1674.4,
+      "rating": 1674,
+      "average_opponent_rating": 1504,
+      "day_record": "13-11",
+      "day_pct": 53.4,
+      "game_pct": 51.3,
+      "mvp_rate": 41.7,
+      "clown_rate": 12.5,
+      "mvp": 10,
+      "clown": 3,
+      "days": 24,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        },
+        {
+          "day": 2,
+          "rating": 1543.6
+        },
+        {
+          "day": 3,
+          "rating": 1476.6
+        },
+        {
+          "day": 5,
+          "rating": 1542.4
+        },
+        {
+          "day": 6,
+          "rating": 1509.8
+        },
+        {
+          "day": 7,
+          "rating": 1470.6
+        },
+        {
+          "day": 8,
+          "rating": 1448.8
+        },
+        {
+          "day": 9,
+          "rating": 1462.1
+        },
+        {
+          "day": 10,
+          "rating": 1532.6
+        },
+        {
+          "day": 11,
+          "rating": 1447.4
+        },
+        {
+          "day": 12,
+          "rating": 1417.4
+        },
+        {
+          "day": 13,
+          "rating": 1442.1
+        },
+        {
+          "day": 15,
+          "rating": 1518.2
+        },
+        {
+          "day": 16,
+          "rating": 1542.5
+        },
+        {
+          "day": 17,
+          "rating": 1597.2
+        },
+        {
+          "day": 18,
+          "rating": 1540.6
+        },
+        {
+          "day": 19,
+          "rating": 1511.4
+        },
+        {
+          "day": 20,
+          "rating": 1555.1
+        },
+        {
+          "day": 21,
+          "rating": 1574.3
+        },
+        {
+          "day": 22,
+          "rating": 1618.1
+        },
+        {
+          "day": 23,
+          "rating": 1657.2
+        },
+        {
+          "day": 24,
+          "rating": 1675.7
+        },
+        {
+          "day": 25,
+          "rating": 1702.9
+        },
+        {
+          "day": 26,
+          "rating": 1674.4
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "name": "Sam G",
+      "score": 1652.7,
+      "rating": 1653,
+      "average_opponent_rating": 1494,
+      "day_record": "15-11",
+      "day_pct": 56.5,
+      "game_pct": 51.5,
+      "mvp_rate": 23.1,
+      "clown_rate": 3.8,
+      "mvp": 6,
+      "clown": 1,
+      "days": 26,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1561.3
+        },
+        {
+          "day": 2,
+          "rating": 1591.0
+        },
+        {
+          "day": 3,
+          "rating": 1667.7
+        },
+        {
+          "day": 4,
+          "rating": 1648.5
+        },
+        {
+          "day": 5,
+          "rating": 1678.4
+        },
+        {
+          "day": 6,
+          "rating": 1762.7
+        },
+        {
+          "day": 7,
+          "rating": 1806.6
+        },
+        {
+          "day": 8,
+          "rating": 1876.7
+        },
+        {
+          "day": 9,
+          "rating": 1911.8
+        },
+        {
+          "day": 10,
+          "rating": 1888.4
+        },
+        {
+          "day": 11,
+          "rating": 1896.7
+        },
+        {
+          "day": 12,
+          "rating": 1900.2
+        },
+        {
+          "day": 13,
+          "rating": 1853.9
+        },
+        {
+          "day": 14,
+          "rating": 1803.6
+        },
+        {
+          "day": 15,
+          "rating": 1751.0
+        },
+        {
+          "day": 16,
+          "rating": 1791.1
+        },
+        {
+          "day": 17,
+          "rating": 1750.7
+        },
+        {
+          "day": 18,
+          "rating": 1760.5
+        },
+        {
+          "day": 19,
+          "rating": 1725.0
+        },
+        {
+          "day": 20,
+          "rating": 1697.4
+        },
+        {
+          "day": 21,
+          "rating": 1667.1
+        },
+        {
+          "day": 22,
+          "rating": 1616.2
+        },
+        {
+          "day": 23,
+          "rating": 1589.0
+        },
+        {
+          "day": 24,
+          "rating": 1628.2
+        },
+        {
+          "day": 25,
+          "rating": 1637.2
+        },
+        {
+          "day": 26,
+          "rating": 1652.7
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "name": "Eric",
+      "score": 1546.8,
+      "rating": 1547,
+      "average_opponent_rating": 1500,
+      "day_record": "10-11",
+      "day_pct": 48.1,
+      "game_pct": 55.0,
+      "mvp_rate": 14.3,
+      "clown_rate": 4.8,
+      "mvp": 3,
+      "clown": 1,
+      "days": 21,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        },
+        {
+          "day": 2,
+          "rating": 1502.3
+        },
+        {
+          "day": 3,
+          "rating": 1524.3
+        },
+        {
+          "day": 4,
+          "rating": 1499.7
+        },
+        {
+          "day": 5,
+          "rating": 1475.4
+        },
+        {
+          "day": 6,
+          "rating": 1394.9
+        },
+        {
+          "day": 7,
+          "rating": 1476.2
+        },
+        {
+          "day": 8,
+          "rating": 1495.9
+        },
+        {
+          "day": 9,
+          "rating": 1524.7
+        },
+        {
+          "day": 10,
+          "rating": 1494.0
+        },
+        {
+          "day": 11,
+          "rating": 1459.0
+        },
+        {
+          "day": 12,
+          "rating": 1433.5
+        },
+        {
+          "day": 13,
+          "rating": 1452.0
+        },
+        {
+          "day": 18,
+          "rating": 1429.0
+        },
+        {
+          "day": 19,
+          "rating": 1459.2
+        },
+        {
+          "day": 20,
+          "rating": 1439.3
+        },
+        {
+          "day": 21,
+          "rating": 1491.6
+        },
+        {
+          "day": 22,
+          "rating": 1517.8
+        },
+        {
+          "day": 23,
+          "rating": 1540.5
+        },
+        {
+          "day": 24,
+          "rating": 1564.7
+        },
+        {
+          "day": 25,
+          "rating": 1546.8
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "name": "Joe",
+      "score": 1515.3,
+      "rating": 1515,
+      "average_opponent_rating": 1496,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 58.8,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 23,
+          "rating": 1515.3
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "name": "Chris",
+      "score": 1514.9,
+      "rating": 1515,
+      "average_opponent_rating": 1497,
+      "day_record": "2-1",
+      "day_pct": 56.2,
+      "game_pct": 48.5,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 3,
+      "history": [
+        {
+          "day": 19,
+          "rating": 1485.2
+        },
+        {
+          "day": 25,
+          "rating": 1491.8
+        },
+        {
+          "day": 26,
+          "rating": 1514.9
+        }
+      ],
+      "rank": 5
+    },
+    {
+      "name": "Adam",
+      "score": 1514.8,
+      "rating": 1515,
+      "average_opponent_rating": 1503,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 57.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 26,
+          "rating": 1514.8
+        }
+      ],
+      "rank": 6
+    },
+    {
+      "name": "Charlie",
+      "score": 1514.8,
+      "rating": 1515,
+      "average_opponent_rating": 1510,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 57.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 21,
+          "rating": 1514.8
+        }
+      ],
+      "rank": 7
+    },
+    {
+      "name": "Tighe",
+      "score": 1497.3,
+      "rating": 1497,
+      "average_opponent_rating": 1505,
+      "day_record": "1-1",
+      "day_pct": 50.0,
+      "game_pct": 45.8,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 2,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        },
+        {
+          "day": 4,
+          "rating": 1497.3
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "name": "Jacob",
+      "score": 1488.2,
+      "rating": 1488,
+      "average_opponent_rating": 1498,
+      "day_record": "12-14",
+      "day_pct": 46.8,
+      "game_pct": 49.7,
+      "mvp_rate": 11.5,
+      "clown_rate": 7.7,
+      "mvp": 3,
+      "clown": 2,
+      "days": 26,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        },
+        {
+          "day": 2,
+          "rating": 1546.0
+        },
+        {
+          "day": 3,
+          "rating": 1535.1
+        },
+        {
+          "day": 4,
+          "rating": 1466.4
+        },
+        {
+          "day": 5,
+          "rating": 1442.9
+        },
+        {
+          "day": 6,
+          "rating": 1476.0
+        },
+        {
+          "day": 7,
+          "rating": 1515.2
+        },
+        {
+          "day": 8,
+          "rating": 1495.2
+        },
+        {
+          "day": 9,
+          "rating": 1467.4
+        },
+        {
+          "day": 10,
+          "rating": 1500.2
+        },
+        {
+          "day": 11,
+          "rating": 1537.2
+        },
+        {
+          "day": 12,
+          "rating": 1602.1
+        },
+        {
+          "day": 13,
+          "rating": 1614.1
+        },
+        {
+          "day": 14,
+          "rating": 1577.7
+        },
+        {
+          "day": 15,
+          "rating": 1538.0
+        },
+        {
+          "day": 16,
+          "rating": 1510.9
+        },
+        {
+          "day": 17,
+          "rating": 1483.6
+        },
+        {
+          "day": 18,
+          "rating": 1530.2
+        },
+        {
+          "day": 19,
+          "rating": 1504.3
+        },
+        {
+          "day": 20,
+          "rating": 1485.5
+        },
+        {
+          "day": 21,
+          "rating": 1507.1
+        },
+        {
+          "day": 22,
+          "rating": 1482.7
+        },
+        {
+          "day": 23,
+          "rating": 1504.7
+        },
+        {
+          "day": 24,
+          "rating": 1461.7
+        },
+        {
+          "day": 25,
+          "rating": 1449.4
+        },
+        {
+          "day": 26,
+          "rating": 1488.2
+        }
+      ],
+      "rank": 9
+    },
+    {
+      "name": "Quinn",
+      "score": 1473.7,
+      "rating": 1474,
+      "average_opponent_rating": 1504,
+      "day_record": "4-5",
+      "day_pct": 46.4,
+      "game_pct": 49.3,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 9,
+      "history": [
+        {
+          "day": 11,
+          "rating": 1484.6
+        },
+        {
+          "day": 13,
+          "rating": 1492.9
+        },
+        {
+          "day": 16,
+          "rating": 1470.1
+        },
+        {
+          "day": 17,
+          "rating": 1493.3
+        },
+        {
+          "day": 18,
+          "rating": 1469.4
+        },
+        {
+          "day": 19,
+          "rating": 1497.9
+        },
+        {
+          "day": 22,
+          "rating": 1533.0
+        },
+        {
+          "day": 24,
+          "rating": 1494.9
+        },
+        {
+          "day": 25,
+          "rating": 1473.7
+        }
+      ],
+      "rank": 10
+    },
+    {
+      "name": "AB",
+      "score": 1415.5,
+      "rating": 1416,
+      "average_opponent_rating": 1499,
+      "day_record": "13-11",
+      "day_pct": 53.4,
+      "game_pct": 52.9,
+      "mvp_rate": 4.2,
+      "clown_rate": 33.3,
+      "mvp": 1,
+      "clown": 8,
+      "days": 24,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        },
+        {
+          "day": 2,
+          "rating": 1457.3
+        },
+        {
+          "day": 3,
+          "rating": 1436.8
+        },
+        {
+          "day": 4,
+          "rating": 1461.7
+        },
+        {
+          "day": 5,
+          "rating": 1437.8
+        },
+        {
+          "day": 6,
+          "rating": 1470.6
+        },
+        {
+          "day": 7,
+          "rating": 1387.0
+        },
+        {
+          "day": 8,
+          "rating": 1320.3
+        },
+        {
+          "day": 9,
+          "rating": 1302.7
+        },
+        {
+          "day": 10,
+          "rating": 1288.8
+        },
+        {
+          "day": 11,
+          "rating": 1385.4
+        },
+        {
+          "day": 12,
+          "rating": 1424.3
+        },
+        {
+          "day": 13,
+          "rating": 1411.0
+        },
+        {
+          "day": 14,
+          "rating": 1451.3
+        },
+        {
+          "day": 15,
+          "rating": 1420.2
+        },
+        {
+          "day": 16,
+          "rating": 1450.9
+        },
+        {
+          "day": 17,
+          "rating": 1482.0
+        },
+        {
+          "day": 19,
+          "rating": 1509.1
+        },
+        {
+          "day": 20,
+          "rating": 1467.7
+        },
+        {
+          "day": 21,
+          "rating": 1425.4
+        },
+        {
+          "day": 22,
+          "rating": 1405.3
+        },
+        {
+          "day": 24,
+          "rating": 1435.0
+        },
+        {
+          "day": 25,
+          "rating": 1452.8
+        },
+        {
+          "day": 26,
+          "rating": 1415.5
+        }
+      ],
+      "rank": 11
+    },
+    {
+      "name": "Sam S",
+      "score": 1414.7,
+      "rating": 1415,
+      "average_opponent_rating": 1503,
+      "day_record": "7-10",
+      "day_pct": 43.2,
+      "game_pct": 48.7,
+      "mvp_rate": 11.8,
+      "clown_rate": 17.6,
+      "mvp": 2,
+      "clown": 3,
+      "days": 17,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1438.7
+        },
+        {
+          "day": 2,
+          "rating": 1409.9
+        },
+        {
+          "day": 3,
+          "rating": 1420.8
+        },
+        {
+          "day": 5,
+          "rating": 1349.3
+        },
+        {
+          "day": 8,
+          "rating": 1328.3
+        },
+        {
+          "day": 9,
+          "rating": 1348.9
+        },
+        {
+          "day": 14,
+          "rating": 1426.6
+        },
+        {
+          "day": 15,
+          "rating": 1470.0
+        },
+        {
+          "day": 16,
+          "rating": 1392.5
+        },
+        {
+          "day": 17,
+          "rating": 1354.8
+        },
+        {
+          "day": 18,
+          "rating": 1338.6
+        },
+        {
+          "day": 19,
+          "rating": 1419.0
+        },
+        {
+          "day": 20,
+          "rating": 1447.8
+        },
+        {
+          "day": 22,
+          "rating": 1482.9
+        },
+        {
+          "day": 24,
+          "rating": 1451.8
+        },
+        {
+          "day": 25,
+          "rating": 1437.6
+        },
+        {
+          "day": 26,
+          "rating": 1414.7
+        }
+      ],
+      "rank": 12
+    },
+    {
+      "name": "Kiernan",
+      "score": 1412.2,
+      "rating": 1412,
+      "average_opponent_rating": 1506,
+      "day_record": "9-12",
+      "day_pct": 44.2,
+      "game_pct": 46.1,
+      "mvp_rate": 4.8,
+      "clown_rate": 9.5,
+      "mvp": 1,
+      "clown": 2,
+      "days": 21,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        },
+        {
+          "day": 2,
+          "rating": 1454.9
+        },
+        {
+          "day": 4,
+          "rating": 1515.8
+        },
+        {
+          "day": 6,
+          "rating": 1482.9
+        },
+        {
+          "day": 7,
+          "rating": 1443.9
+        },
+        {
+          "day": 8,
+          "rating": 1458.3
+        },
+        {
+          "day": 9,
+          "rating": 1427.2
+        },
+        {
+          "day": 11,
+          "rating": 1388.0
+        },
+        {
+          "day": 12,
+          "rating": 1351.5
+        },
+        {
+          "day": 13,
+          "rating": 1328.4
+        },
+        {
+          "day": 14,
+          "rating": 1332.0
+        },
+        {
+          "day": 15,
+          "rating": 1385.3
+        },
+        {
+          "day": 16,
+          "rating": 1365.0
+        },
+        {
+          "day": 17,
+          "rating": 1401.9
+        },
+        {
+          "day": 18,
+          "rating": 1384.2
+        },
+        {
+          "day": 19,
+          "rating": 1416.3
+        },
+        {
+          "day": 20,
+          "rating": 1441.5
+        },
+        {
+          "day": 22,
+          "rating": 1471.1
+        },
+        {
+          "day": 23,
+          "rating": 1447.6
+        },
+        {
+          "day": 24,
+          "rating": 1423.8
+        },
+        {
+          "day": 25,
+          "rating": 1412.2
+        }
+      ],
+      "rank": 13
+    },
+    {
+      "name": "Anthony",
+      "score": 1394.7,
+      "rating": 1395,
+      "average_opponent_rating": 1496,
+      "day_record": "2-4",
+      "day_pct": 40.9,
+      "game_pct": 44.7,
+      "mvp_rate": 0.0,
+      "clown_rate": 16.7,
+      "mvp": 0,
+      "clown": 1,
+      "days": 6,
+      "history": [
+        {
+          "day": 10,
+          "rating": 1485.7
+        },
+        {
+          "day": 18,
+          "rating": 1498.4
+        },
+        {
+          "day": 19,
+          "rating": 1523.3
+        },
+        {
+          "day": 22,
+          "rating": 1494.9
+        },
+        {
+          "day": 24,
+          "rating": 1459.5
+        },
+        {
+          "day": 25,
+          "rating": 1394.7
+        }
+      ],
+      "rank": 14
+    },
+    {
+      "name": "Aaron",
+      "score": 1290.2,
+      "rating": 1290,
+      "average_opponent_rating": 1495,
+      "day_record": "6-10",
+      "day_pct": 40.5,
+      "game_pct": 41.7,
+      "mvp_rate": 0.0,
+      "clown_rate": 18.8,
+      "mvp": 0,
+      "clown": 3,
+      "days": 16,
+      "history": [
+        {
+          "day": 5,
+          "rating": 1513.5
+        },
+        {
+          "day": 8,
+          "rating": 1529.8
+        },
+        {
+          "day": 9,
+          "rating": 1515.4
+        },
+        {
+          "day": 13,
+          "rating": 1500.3
+        },
+        {
+          "day": 14,
+          "rating": 1468.6
+        },
+        {
+          "day": 15,
+          "rating": 1384.6
+        },
+        {
+          "day": 16,
+          "rating": 1411.8
+        },
+        {
+          "day": 17,
+          "rating": 1375.9
+        },
+        {
+          "day": 18,
+          "rating": 1401.5
+        },
+        {
+          "day": 19,
+          "rating": 1320.3
+        },
+        {
+          "day": 21,
+          "rating": 1300.5
+        },
+        {
+          "day": 22,
+          "rating": 1278.9
+        },
+        {
+          "day": 23,
+          "rating": 1226.2
+        },
+        {
+          "day": 24,
+          "rating": 1276.2
+        },
+        {
+          "day": 25,
+          "rating": 1306.2
+        },
+        {
+          "day": 26,
+          "rating": 1290.2
+        }
+      ],
+      "rank": 15
+    }
+  ],
+  "2023": [
+    {
+      "name": "Sam G",
+      "score": 1561.3,
+      "rating": 1561,
+      "average_opponent_rating": 1500,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 61.1,
+      "mvp_rate": 100.0,
+      "clown_rate": 0.0,
+      "mvp": 1,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1561.3
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "name": "AB",
+      "score": 1516.3,
+      "rating": 1516,
+      "average_opponent_rating": 1500,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 61.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "name": "Eric",
+      "score": 1516.3,
+      "rating": 1516,
+      "average_opponent_rating": 1500,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 61.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "name": "Jacob",
+      "score": 1516.3,
+      "rating": 1516,
+      "average_opponent_rating": 1500,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 61.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1516.3
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "name": "Brandon",
+      "score": 1483.7,
+      "rating": 1484,
+      "average_opponent_rating": 1500,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 38.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        }
+      ],
+      "rank": 5
+    },
+    {
+      "name": "Kiernan",
+      "score": 1483.7,
+      "rating": 1484,
+      "average_opponent_rating": 1500,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 38.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        }
+      ],
+      "rank": 6
+    },
+    {
+      "name": "Tighe",
+      "score": 1483.7,
+      "rating": 1484,
+      "average_opponent_rating": 1500,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 38.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.7
+        }
+      ],
+      "rank": 7
+    },
+    {
+      "name": "Sam S",
+      "score": 1438.7,
+      "rating": 1439,
+      "average_opponent_rating": 1500,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 38.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 100.0,
+      "mvp": 0,
+      "clown": 1,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1438.7
+        }
+      ],
+      "rank": 8
+    }
+  ],
+  "2024": [
+    {
+      "name": "Sam G",
+      "score": 1746.9,
+      "rating": 1747,
+      "average_opponent_rating": 1494,
+      "day_record": "10-5",
+      "day_pct": 62.5,
+      "game_pct": 54.4,
+      "mvp_rate": 26.7,
+      "clown_rate": 0.0,
+      "mvp": 4,
+      "clown": 0,
+      "days": 15,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1517.5
+        },
+        {
+          "day": 2,
+          "rating": 1588.1
+        },
+        {
+          "day": 3,
+          "rating": 1569.6
+        },
+        {
+          "day": 4,
+          "rating": 1595.9
+        },
+        {
+          "day": 5,
+          "rating": 1678.1
+        },
+        {
+          "day": 6,
+          "rating": 1720.8
+        },
+        {
+          "day": 7,
+          "rating": 1789.4
+        },
+        {
+          "day": 8,
+          "rating": 1823.4
+        },
+        {
+          "day": 9,
+          "rating": 1799.9
+        },
+        {
+          "day": 10,
+          "rating": 1843.1
+        },
+        {
+          "day": 11,
+          "rating": 1849.8
+        },
+        {
+          "day": 12,
+          "rating": 1804.7
+        },
+        {
+          "day": 13,
+          "rating": 1754.3
+        },
+        {
+          "day": 14,
+          "rating": 1701.7
+        },
+        {
+          "day": 15,
+          "rating": 1746.9
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "name": "Brandon",
+      "score": 1580.4,
+      "rating": 1580,
+      "average_opponent_rating": 1504,
+      "day_record": "6-7",
+      "day_pct": 47.2,
+      "game_pct": 49.4,
+      "mvp_rate": 38.5,
+      "clown_rate": 15.4,
+      "mvp": 5,
+      "clown": 2,
+      "days": 13,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1562.5
+        },
+        {
+          "day": 2,
+          "rating": 1505.9
+        },
+        {
+          "day": 4,
+          "rating": 1573.2
+        },
+        {
+          "day": 5,
+          "rating": 1544.7
+        },
+        {
+          "day": 6,
+          "rating": 1507.8
+        },
+        {
+          "day": 7,
+          "rating": 1488.2
+        },
+        {
+          "day": 8,
+          "rating": 1503.3
+        },
+        {
+          "day": 9,
+          "rating": 1574.3
+        },
+        {
+          "day": 10,
+          "rating": 1490.0
+        },
+        {
+          "day": 11,
+          "rating": 1455.9
+        },
+        {
+          "day": 12,
+          "rating": 1478.4
+        },
+        {
+          "day": 14,
+          "rating": 1557.5
+        },
+        {
+          "day": 15,
+          "rating": 1580.4
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "name": "Tighe",
+      "score": 1515.2,
+      "rating": 1515,
+      "average_opponent_rating": 1505,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 56.2,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 3,
+          "rating": 1515.2
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "name": "Anthony",
+      "score": 1485.7,
+      "rating": 1486,
+      "average_opponent_rating": 1486,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 46.2,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 9,
+          "rating": 1485.7
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "name": "Jacob",
+      "score": 1480.9,
+      "rating": 1481,
+      "average_opponent_rating": 1498,
+      "day_record": "7-8",
+      "day_pct": 47.5,
+      "game_pct": 50.0,
+      "mvp_rate": 6.7,
+      "clown_rate": 6.7,
+      "mvp": 1,
+      "clown": 1,
+      "days": 15,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1517.5
+        },
+        {
+          "day": 2,
+          "rating": 1505.9
+        },
+        {
+          "day": 3,
+          "rating": 1436.5
+        },
+        {
+          "day": 4,
+          "rating": 1411.7
+        },
+        {
+          "day": 5,
+          "rating": 1441.4
+        },
+        {
+          "day": 6,
+          "rating": 1478.5
+        },
+        {
+          "day": 7,
+          "rating": 1458.5
+        },
+        {
+          "day": 8,
+          "rating": 1430.0
+        },
+        {
+          "day": 9,
+          "rating": 1460.6
+        },
+        {
+          "day": 10,
+          "rating": 1499.4
+        },
+        {
+          "day": 11,
+          "rating": 1571.3
+        },
+        {
+          "day": 12,
+          "rating": 1585.3
+        },
+        {
+          "day": 13,
+          "rating": 1547.9
+        },
+        {
+          "day": 14,
+          "rating": 1507.8
+        },
+        {
+          "day": 15,
+          "rating": 1480.9
+        }
+      ],
+      "rank": 5
+    },
+    {
+      "name": "Sam S",
+      "score": 1477.1,
+      "rating": 1477,
+      "average_opponent_rating": 1504,
+      "day_record": "4-4",
+      "day_pct": 50.0,
+      "game_pct": 54.7,
+      "mvp_rate": 12.5,
+      "clown_rate": 25.0,
+      "mvp": 1,
+      "clown": 2,
+      "days": 8,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.5
+        },
+        {
+          "day": 2,
+          "rating": 1495.0
+        },
+        {
+          "day": 4,
+          "rating": 1428.6
+        },
+        {
+          "day": 7,
+          "rating": 1410.7
+        },
+        {
+          "day": 8,
+          "rating": 1431.6
+        },
+        {
+          "day": 13,
+          "rating": 1510.6
+        },
+        {
+          "day": 14,
+          "rating": 1553.6
+        },
+        {
+          "day": 15,
+          "rating": 1477.1
+        }
+      ],
+      "rank": 6
+    },
+    {
+      "name": "Quinn",
+      "score": 1469.9,
+      "rating": 1470,
+      "average_opponent_rating": 1506,
+      "day_record": "1-2",
+      "day_pct": 43.8,
+      "game_pct": 40.6,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 3,
+      "history": [
+        {
+          "day": 10,
+          "rating": 1484.5
+        },
+        {
+          "day": 12,
+          "rating": 1492.6
+        },
+        {
+          "day": 15,
+          "rating": 1469.9
+        }
+      ],
+      "rank": 7
+    },
+    {
+      "name": "AB",
+      "score": 1415.2,
+      "rating": 1415,
+      "average_opponent_rating": 1499,
+      "day_record": "8-7",
+      "day_pct": 52.5,
+      "game_pct": 52.2,
+      "mvp_rate": 6.7,
+      "clown_rate": 33.3,
+      "mvp": 1,
+      "clown": 5,
+      "days": 15,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1438.5
+        },
+        {
+          "day": 2,
+          "rating": 1412.8
+        },
+        {
+          "day": 3,
+          "rating": 1431.3
+        },
+        {
+          "day": 4,
+          "rating": 1405.9
+        },
+        {
+          "day": 5,
+          "rating": 1435.2
+        },
+        {
+          "day": 6,
+          "rating": 1350.5
+        },
+        {
+          "day": 7,
+          "rating": 1283.8
+        },
+        {
+          "day": 8,
+          "rating": 1263.8
+        },
+        {
+          "day": 9,
+          "rating": 1247.5
+        },
+        {
+          "day": 10,
+          "rating": 1330.8
+        },
+        {
+          "day": 11,
+          "rating": 1375.7
+        },
+        {
+          "day": 12,
+          "rating": 1366.2
+        },
+        {
+          "day": 13,
+          "rating": 1411.1
+        },
+        {
+          "day": 14,
+          "rating": 1380.8
+        },
+        {
+          "day": 15,
+          "rating": 1415.2
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "name": "Eric",
+      "score": 1413.3,
+      "rating": 1413,
+      "average_opponent_rating": 1498,
+      "day_record": "4-8",
+      "day_pct": 38.2,
+      "game_pct": 44.3,
+      "mvp_rate": 16.7,
+      "clown_rate": 8.3,
+      "mvp": 2,
+      "clown": 1,
+      "days": 12,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.5
+        },
+        {
+          "day": 2,
+          "rating": 1495.0
+        },
+        {
+          "day": 3,
+          "rating": 1469.5
+        },
+        {
+          "day": 4,
+          "rating": 1443.5
+        },
+        {
+          "day": 5,
+          "rating": 1361.0
+        },
+        {
+          "day": 6,
+          "rating": 1440.0
+        },
+        {
+          "day": 7,
+          "rating": 1457.6
+        },
+        {
+          "day": 8,
+          "rating": 1484.3
+        },
+        {
+          "day": 9,
+          "rating": 1452.6
+        },
+        {
+          "day": 10,
+          "rating": 1413.4
+        },
+        {
+          "day": 11,
+          "rating": 1388.5
+        },
+        {
+          "day": 12,
+          "rating": 1413.3
+        }
+      ],
+      "rank": 9
+    },
+    {
+      "name": "Aaron",
+      "score": 1412.1,
+      "rating": 1412,
+      "average_opponent_rating": 1495,
+      "day_record": "3-4",
+      "day_pct": 45.8,
+      "game_pct": 44.6,
+      "mvp_rate": 0.0,
+      "clown_rate": 14.3,
+      "mvp": 0,
+      "clown": 1,
+      "days": 7,
+      "history": [
+        {
+          "day": 4,
+          "rating": 1513.4
+        },
+        {
+          "day": 7,
+          "rating": 1529.8
+        },
+        {
+          "day": 8,
+          "rating": 1515.3
+        },
+        {
+          "day": 12,
+          "rating": 1500.3
+        },
+        {
+          "day": 13,
+          "rating": 1468.7
+        },
+        {
+          "day": 14,
+          "rating": 1384.9
+        },
+        {
+          "day": 15,
+          "rating": 1412.1
+        }
+      ],
+      "rank": 10
+    },
+    {
+      "name": "Kiernan",
+      "score": 1390.1,
+      "rating": 1390,
+      "average_opponent_rating": 1505,
+      "day_record": "5-7",
+      "day_pct": 44.1,
+      "game_pct": 44.3,
+      "mvp_rate": 8.3,
+      "clown_rate": 16.7,
+      "mvp": 1,
+      "clown": 2,
+      "days": 12,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1483.5
+        },
+        {
+          "day": 3,
+          "rating": 1543.6
+        },
+        {
+          "day": 5,
+          "rating": 1515.9
+        },
+        {
+          "day": 6,
+          "rating": 1480.0
+        },
+        {
+          "day": 7,
+          "rating": 1494.0
+        },
+        {
+          "day": 8,
+          "rating": 1465.2
+        },
+        {
+          "day": 10,
+          "rating": 1427.5
+        },
+        {
+          "day": 11,
+          "rating": 1392.6
+        },
+        {
+          "day": 12,
+          "rating": 1368.8
+        },
+        {
+          "day": 13,
+          "rating": 1357.5
+        },
+        {
+          "day": 14,
+          "rating": 1412.9
+        },
+        {
+          "day": 15,
+          "rating": 1390.1
+        }
+      ],
+      "rank": 11
+    }
+  ],
+  "2025": [
+    {
+      "name": "Kiernan",
+      "score": 1552.8,
+      "rating": 1553,
+      "average_opponent_rating": 1499,
+      "day_record": "3-1",
+      "day_pct": 61.1,
+      "game_pct": 57.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1515.8
+        },
+        {
+          "day": 2,
+          "rating": 1505.3
+        },
+        {
+          "day": 3,
+          "rating": 1530.0
+        },
+        {
+          "day": 4,
+          "rating": 1552.8
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "name": "Brandon",
+      "score": 1544.4,
+      "rating": 1544,
+      "average_opponent_rating": 1499,
+      "day_record": "2-2",
+      "day_pct": 50.0,
+      "game_pct": 48.6,
+      "mvp_rate": 50.0,
+      "clown_rate": 25.0,
+      "mvp": 2,
+      "clown": 1,
+      "days": 4,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1560.8
+        },
+        {
+          "day": 2,
+          "rating": 1505.3
+        },
+        {
+          "day": 3,
+          "rating": 1481.2
+        },
+        {
+          "day": 4,
+          "rating": 1544.4
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "name": "Sam S",
+      "score": 1542.7,
+      "rating": 1543,
+      "average_opponent_rating": 1499,
+      "day_record": "2-2",
+      "day_pct": 50.0,
+      "game_pct": 48.6,
+      "mvp_rate": 25.0,
+      "clown_rate": 0.0,
+      "mvp": 1,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.2
+        },
+        {
+          "day": 2,
+          "rating": 1461.8
+        },
+        {
+          "day": 3,
+          "rating": 1524.5
+        },
+        {
+          "day": 4,
+          "rating": 1542.7
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "name": "Anthony",
+      "score": 1536.9,
+      "rating": 1537,
+      "average_opponent_rating": 1501,
+      "day_record": "2-0",
+      "day_pct": 64.3,
+      "game_pct": 59.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 2,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1512.7
+        },
+        {
+          "day": 3,
+          "rating": 1536.9
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "name": "Quinn",
+      "score": 1530.0,
+      "rating": 1530,
+      "average_opponent_rating": 1499,
+      "day_record": "2-1",
+      "day_pct": 56.2,
+      "game_pct": 59.3,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 3,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1515.8
+        },
+        {
+          "day": 2,
+          "rating": 1505.3
+        },
+        {
+          "day": 3,
+          "rating": 1530.0
+        }
+      ],
+      "rank": 5
+    },
+    {
+      "name": "Jacob",
+      "score": 1493.3,
+      "rating": 1493,
+      "average_opponent_rating": 1500,
+      "day_record": "1-3",
+      "day_pct": 38.9,
+      "game_pct": 42.9,
+      "mvp_rate": 25.0,
+      "clown_rate": 0.0,
+      "mvp": 1,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.2
+        },
+        {
+          "day": 2,
+          "rating": 1540.3
+        },
+        {
+          "day": 3,
+          "rating": 1515.2
+        },
+        {
+          "day": 4,
+          "rating": 1493.3
+        }
+      ],
+      "rank": 6
+    },
+    {
+      "name": "Eric",
+      "score": 1487.0,
+      "rating": 1487,
+      "average_opponent_rating": 1498,
+      "day_record": "1-2",
+      "day_pct": 43.8,
+      "game_pct": 53.3,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 3,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1487.9
+        },
+        {
+          "day": 3,
+          "rating": 1503.8
+        },
+        {
+          "day": 4,
+          "rating": 1487.0
+        }
+      ],
+      "rank": 7
+    },
+    {
+      "name": "AB",
+      "score": 1485.5,
+      "rating": 1486,
+      "average_opponent_rating": 1499,
+      "day_record": "2-1",
+      "day_pct": 56.2,
+      "game_pct": 60.0,
+      "mvp_rate": 0.0,
+      "clown_rate": 33.3,
+      "mvp": 0,
+      "clown": 1,
+      "days": 3,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1515.8
+        },
+        {
+          "day": 3,
+          "rating": 1541.1
+        },
+        {
+          "day": 4,
+          "rating": 1485.5
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "name": "Chris",
+      "score": 1485.4,
+      "rating": 1485,
+      "average_opponent_rating": 1499,
+      "day_record": "0-1",
+      "day_pct": 41.7,
+      "game_pct": 41.2,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 3,
+          "rating": 1485.4
+        }
+      ],
+      "rank": 9
+    },
+    {
+      "name": "Sam G",
+      "score": 1448.3,
+      "rating": 1448,
+      "average_opponent_rating": 1500,
+      "day_record": "1-3",
+      "day_pct": 38.9,
+      "game_pct": 42.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.2
+        },
+        {
+          "day": 2,
+          "rating": 1495.3
+        },
+        {
+          "day": 3,
+          "rating": 1470.2
+        },
+        {
+          "day": 4,
+          "rating": 1448.3
+        }
+      ],
+      "rank": 10
+    },
+    {
+      "name": "Aaron",
+      "score": 1425.2,
+      "rating": 1425,
+      "average_opponent_rating": 1501,
+      "day_record": "1-2",
+      "day_pct": 43.8,
+      "game_pct": 40.7,
+      "mvp_rate": 0.0,
+      "clown_rate": 33.3,
+      "mvp": 0,
+      "clown": 1,
+      "days": 3,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.2
+        },
+        {
+          "day": 2,
+          "rating": 1495.3
+        },
+        {
+          "day": 3,
+          "rating": 1425.2
+        }
+      ],
+      "rank": 11
+    }
+  ],
+  "2026": [
+    {
+      "name": "Brandon",
+      "score": 1750.0,
+      "rating": 1750,
+      "average_opponent_rating": 1499,
+      "day_record": "5-1",
+      "day_pct": 68.2,
+      "game_pct": 59.6,
+      "mvp_rate": 50.0,
+      "clown_rate": 0.0,
+      "mvp": 3,
+      "clown": 0,
+      "days": 6,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1514.4
+        },
+        {
+          "day": 2,
+          "rating": 1587.8
+        },
+        {
+          "day": 3,
+          "rating": 1664.8
+        },
+        {
+          "day": 4,
+          "rating": 1703.2
+        },
+        {
+          "day": 5,
+          "rating": 1774.2
+        },
+        {
+          "day": 6,
+          "rating": 1750.0
+        }
+      ],
+      "rank": 1
+    },
+    {
+      "name": "Eric",
+      "score": 1649.4,
+      "rating": 1649,
+      "average_opponent_rating": 1498,
+      "day_record": "4-1",
+      "day_pct": 65.0,
+      "game_pct": 67.4,
+      "mvp_rate": 20.0,
+      "clown_rate": 0.0,
+      "mvp": 1,
+      "clown": 0,
+      "days": 5,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1559.4
+        },
+        {
+          "day": 2,
+          "rating": 1587.8
+        },
+        {
+          "day": 3,
+          "rating": 1619.8
+        },
+        {
+          "day": 4,
+          "rating": 1658.2
+        },
+        {
+          "day": 5,
+          "rating": 1649.4
+        }
+      ],
+      "rank": 2
+    },
+    {
+      "name": "Chris",
+      "score": 1532.3,
+      "rating": 1532,
+      "average_opponent_rating": 1502,
+      "day_record": "2-0",
+      "day_pct": 64.3,
+      "game_pct": 53.8,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 2,
+      "history": [
+        {
+          "day": 5,
+          "rating": 1509.0
+        },
+        {
+          "day": 6,
+          "rating": 1532.3
+        }
+      ],
+      "rank": 3
+    },
+    {
+      "name": "Joe",
+      "score": 1515.0,
+      "rating": 1515,
+      "average_opponent_rating": 1494,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 58.8,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 3,
+          "rating": 1515.0
+        }
+      ],
+      "rank": 4
+    },
+    {
+      "name": "Adam",
+      "score": 1514.9,
+      "rating": 1515,
+      "average_opponent_rating": 1503,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 57.9,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 6,
+          "rating": 1514.9
+        }
+      ],
+      "rank": 5
+    },
+    {
+      "name": "Charlie",
+      "score": 1514.4,
+      "rating": 1514,
+      "average_opponent_rating": 1500,
+      "day_record": "1-0",
+      "day_pct": 58.3,
+      "game_pct": 57.1,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 1,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1514.4
+        }
+      ],
+      "rank": 6
+    },
+    {
+      "name": "Jacob",
+      "score": 1502.2,
+      "rating": 1502,
+      "average_opponent_rating": 1499,
+      "day_record": "3-3",
+      "day_pct": 50.0,
+      "game_pct": 50.0,
+      "mvp_rate": 16.7,
+      "clown_rate": 16.7,
+      "mvp": 1,
+      "clown": 1,
+      "days": 6,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1514.4
+        },
+        {
+          "day": 2,
+          "rating": 1495.9
+        },
+        {
+          "day": 3,
+          "rating": 1520.4
+        },
+        {
+          "day": 4,
+          "rating": 1445.4
+        },
+        {
+          "day": 5,
+          "rating": 1427.7
+        },
+        {
+          "day": 6,
+          "rating": 1502.2
+        }
+      ],
+      "rank": 7
+    },
+    {
+      "name": "Sam G",
+      "score": 1492.5,
+      "rating": 1493,
+      "average_opponent_rating": 1502,
+      "day_record": "3-3",
+      "day_pct": 50.0,
+      "game_pct": 48.1,
+      "mvp_rate": 16.7,
+      "clown_rate": 16.7,
+      "mvp": 1,
+      "clown": 1,
+      "days": 6,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.6
+        },
+        {
+          "day": 2,
+          "rating": 1411.2
+        },
+        {
+          "day": 3,
+          "rating": 1378.4
+        },
+        {
+          "day": 4,
+          "rating": 1449.2
+        },
+        {
+          "day": 5,
+          "rating": 1463.0
+        },
+        {
+          "day": 6,
+          "rating": 1492.5
+        }
+      ],
+      "rank": 8
+    },
+    {
+      "name": "Quinn",
+      "score": 1483.6,
+      "rating": 1484,
+      "average_opponent_rating": 1497,
+      "day_record": "1-2",
+      "day_pct": 43.8,
+      "game_pct": 50.0,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 3,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1516.3
+        },
+        {
+          "day": 4,
+          "rating": 1497.9
+        },
+        {
+          "day": 5,
+          "rating": 1483.6
+        }
+      ],
+      "rank": 9
+    },
+    {
+      "name": "Sam S",
+      "score": 1455.1,
+      "rating": 1455,
+      "average_opponent_rating": 1498,
+      "day_record": "1-3",
+      "day_pct": 38.9,
+      "game_pct": 46.3,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1516.3
+        },
+        {
+          "day": 4,
+          "rating": 1497.9
+        },
+        {
+          "day": 5,
+          "rating": 1483.6
+        },
+        {
+          "day": 6,
+          "rating": 1455.1
+        }
+      ],
+      "rank": 10
+    },
+    {
+      "name": "Kiernan",
+      "score": 1454.2,
+      "rating": 1454,
+      "average_opponent_rating": 1499,
+      "day_record": "1-3",
+      "day_pct": 38.9,
+      "game_pct": 46.2,
+      "mvp_rate": 0.0,
+      "clown_rate": 0.0,
+      "mvp": 0,
+      "clown": 0,
+      "days": 4,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1516.3
+        },
+        {
+          "day": 3,
+          "rating": 1500.7
+        },
+        {
+          "day": 4,
+          "rating": 1472.9
+        },
+        {
+          "day": 5,
+          "rating": 1454.2
+        }
+      ],
+      "rank": 11
+    },
+    {
+      "name": "Anthony",
+      "score": 1387.6,
+      "rating": 1388,
+      "average_opponent_rating": 1499,
+      "day_record": "0-3",
+      "day_pct": 31.2,
+      "game_pct": 37.5,
+      "mvp_rate": 0.0,
+      "clown_rate": 33.3,
+      "mvp": 0,
+      "clown": 1,
+      "days": 3,
+      "history": [
+        {
+          "day": 2,
+          "rating": 1483.7
+        },
+        {
+          "day": 4,
+          "rating": 1454.8
+        },
+        {
+          "day": 5,
+          "rating": 1387.6
+        }
+      ],
+      "rank": 12
+    },
+    {
+      "name": "Aaron",
+      "score": 1386.0,
+      "rating": 1386,
+      "average_opponent_rating": 1502,
+      "day_record": "2-4",
+      "day_pct": 40.9,
+      "game_pct": 42.3,
+      "mvp_rate": 0.0,
+      "clown_rate": 16.7,
+      "mvp": 0,
+      "clown": 1,
+      "days": 6,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1484.6
+        },
+        {
+          "day": 2,
+          "rating": 1456.2
+        },
+        {
+          "day": 3,
+          "rating": 1378.4
+        },
+        {
+          "day": 4,
+          "rating": 1404.2
+        },
+        {
+          "day": 5,
+          "rating": 1418.0
+        },
+        {
+          "day": 6,
+          "rating": 1386.0
+        }
+      ],
+      "rank": 13
+    },
+    {
+      "name": "AB",
+      "score": 1374.2,
+      "rating": 1374,
+      "average_opponent_rating": 1501,
+      "day_record": "2-3",
+      "day_pct": 45.0,
+      "game_pct": 44.4,
+      "mvp_rate": 0.0,
+      "clown_rate": 40.0,
+      "mvp": 0,
+      "clown": 2,
+      "days": 5,
+      "history": [
+        {
+          "day": 1,
+          "rating": 1439.6
+        },
+        {
+          "day": 2,
+          "rating": 1411.2
+        },
+        {
+          "day": 4,
+          "rating": 1434.5
+        },
+        {
+          "day": 5,
+          "rating": 1448.3
+        },
+        {
+          "day": 6,
+          "rating": 1374.2
+        }
+      ],
+      "rank": 14
+    }
+  ]
+}

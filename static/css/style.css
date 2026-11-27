@@ -528,3 +528,22 @@ body.dark-mode header {
     background-color: var(--background-color);
     border-bottom-color: var(--border-color);
 }
+
+.ranking-method {
+    margin: 0 0 1rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+body.dark-mode .ranking-method {
+    background: var(--background-color);
+}
+
+#rankings-table td:nth-child(1),
+#rankings-table td:nth-child(3) {
+    font-weight: 700;
+}

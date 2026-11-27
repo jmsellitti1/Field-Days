@@ -21,7 +21,7 @@ Usage:
 # Configuration constants
 CONFIG = {
     "EXCEL_FILE": Path("./Field_Days.xlsx"),
-    "SEASONS_RANGE": range(2023, 2027),  # Will be updated dynamically
+    "RATING_VARIANCE_SCALE": 3.0,
     "GAME_TYPES": {
         "PK's": "pk",
         "Cross": "cross",
@@ -53,70 +53,231 @@ def extract_player_names(filename: str) -> List[str]:
     Raises:
         FileNotFoundError: If Excel file doesn't exist.
     """
-    try:
-        days_df = pd.read_excel(filename, sheet_name="Days")
-        player_set = set()
-        
-        for index, row in days_df.iterrows():
-            if pd.notna(row['Team 1']):
-                team1_players = [p.strip() for p in str(row['Team 1']).split(",")]
-                player_set.update(team1_players)
-            if pd.notna(row['Team 2']):
-                team2_players = [p.strip() for p in str(row['Team 2']).split(",")]
-                player_set.update(team2_players)
-        
-        return sorted(list(player_set))
-    except FileNotFoundError:
-        print(f"Error: Excel file '{filename}' not found.")
-        raise
-    except Exception as e:
-        print(f"Error extracting player names: {e}")
-        raise
+    days_df = pd.read_excel(filename, sheet_name="Days")
+    player_set = set()
+
+    for _, row in days_df.iterrows():
+        if pd.notna(row['Team 1']):
+            player_set.update(p.strip() for p in str(row['Team 1']).split(",") if p.strip())
+        if pd.notna(row['Team 2']):
+            player_set.update(p.strip() for p in str(row['Team 2']).split(",") if p.strip())
+
+    return sorted(player_set)
 
 
-def extract_seasons(filename: str) -> range:
-    """Extract the range of seasons (years) from the Days sheet in the Excel file.
+def extract_year(value) -> int:
+    """Extract a year from an Excel date value."""
+    if isinstance(value, pd.Timestamp):
+        return value.year
+    date = pd.to_datetime(value, format='mixed', errors='raise')
+    return date.year
+
+
+def extract_seasons(filename: str) -> List[int]:
+    """Extract the seasons (years) from the Days sheet in the Excel file.
     
     Args:
         filename (str): Path to the Excel file.
     
     Returns:
-        range: Range of years from minimum to maximum year found in the data.
+        List[int]: Sorted list of years found in the data.
     
     Raises:
         FileNotFoundError: If Excel file doesn't exist.
     """
-    try:
-        days_df = pd.read_excel(filename, sheet_name="Days")
-        years = set()
-        
-        for index, row in days_df.iterrows():
-            if isinstance(row['Date'], pd.Timestamp):
-                years.add(row['Date'].year)
+    days_df = pd.read_excel(filename, sheet_name="Days")
+    return sorted({extract_year(value) for value in days_df['Date']})
+
+
+def build_rankings(days_df: pd.DataFrame, seasons: List[int]) -> Dict[str, List[Dict]]:
+    """Build opponent-adjusted Elo rankings from the Days sheet."""
+    scopes = {'total': days_df.copy()}
+    scopes.update({
+        str(season): days_df[days_df['Date'].map(extract_year) == season].copy()
+        for season in seasons
+    })
+
+    rankings: Dict[str, List[Dict]] = {}
+    # Generate one complete ranking table for every scope.
+    for scope, scope_days in scopes.items():
+        player_stats: Dict[str, Dict] = {}
+        # Maintain each player's evolving Elo rating as the days are processed chronologically.
+        player_ratings: Dict[str, float] = {}
+        opponent_ratings: Dict[str, List[float]] = {}
+        # Track the final Elo value immediately after every field day a player participates in.
+        elo_history: Dict[str, List[Dict[str, float]]] = {}
+
+        # Normalize dates so the Elo process always follows true chronological order.
+        scope_days['_parsed_date'] = scope_days['Date'].map(
+            lambda value: value if isinstance(value, pd.Timestamp)
+            else pd.to_datetime(value, format='mixed', errors='raise')
+        )
+        scope_days = scope_days.sort_values('_parsed_date')
+
+        # Process each field day once and update ratings from that day's result.
+        for day_number, (_, row) in enumerate(scope_days.iterrows(), start=1):
+            team1 = [name.strip() for name in str(row['Team 1']).split(',') if name.strip()]
+            team2 = [name.strip() for name in str(row['Team 2']).split(',') if name.strip()]
+            team1_score, team2_score = map(int, str(row['Score']).split('-'))
+
+            # Initialize unseen players at 1500 Elo with empty supporting statistics.
+            for name in team1 + team2:
+                stats = player_stats.setdefault(name, {
+                    'days_played': 0,
+                    'day_wins': 0, 'day_losses': 0,
+                    'game_wins': 0, 'game_losses': 0,
+                    'mvp': 0, 'clown': 0,
+                })
+                stats['days_played'] += 1
+                player_ratings.setdefault(name, 1500.0)
+                opponent_ratings.setdefault(name, [])
+                elo_history.setdefault(name, [])
+
+            # Use the average of both rosters to represent the strength of each team.
+            team1_rating = sum(player_ratings[name] for name in team1) / len(team1)
+            team2_rating = sum(player_ratings[name] for name in team2) / len(team2)
+            for name in team1:
+                opponent_ratings[name].append(team2_rating)
+            for name in team2:
+                opponent_ratings[name].append(team1_rating)
+
+            # Estimate Team 1's expected win probability from the Elo difference.
+            expected_team1 = 1 / (1 + 10 ** ((team2_rating - team1_rating) / 400))
+            if team1_score > team2_score:
+                actual_team1 = 1.0
+            elif team1_score < team2_score:
+                actual_team1 = 0.0
             else:
-                date_str = str(row['Date'])
-                try:
-                    if "-" in date_str:
-                        year = int(date_str.split("-")[0])
-                    else:
-                        year_part = int(date_str.split("/")[-1])
-                        year = year_part if year_part > 1000 else 2000 + year_part
-                    years.add(year)
-                except Exception:
-                    pass
-        
-        if not years:
-            return range(2023, 2024)
-        
-        min_year = min(years)
-        max_year = max(years)
-        return range(min_year, max_year + 1)
-    except FileNotFoundError:
-        print(f"Error: Excel file '{filename}' not found.")
-        raise
-    except Exception as e:
-        print(f"Error extracting seasons: {e}")
-        raise
+                actual_team1 = 0.5
+
+            # Scale surprise outcomes
+            rating_change = 24 * (actual_team1 - expected_team1)
+            # Split the result across teammates, reducing individual change with roster size.
+            for name in team1:
+                player_ratings[name] += rating_change / len(team1) ** 0.5
+            for name in team2:
+                player_ratings[name] -= rating_change / len(team2) ** 0.5
+
+            for name in team1:
+                if team1_score != team2_score:
+                    player_stats[name]['day_wins' if team1_score > team2_score else 'day_losses'] += 1
+            for name in team2:
+                if team1_score != team2_score:
+                    player_stats[name]['day_wins' if team2_score > team1_score else 'day_losses'] += 1
+
+            for column in [column for column in scope_days.columns if str(column).startswith('Game ')]:
+                game = row[column]
+                if pd.isna(game):
+                    continue
+                _, score_text = str(game).rsplit(' ', 1)
+                game_score1, game_score2 = map(int, score_text.strip('()').split('-'))
+                # Attribute points earned and conceded to every Team 1 player.
+                for name in team1:
+                    player_stats[name]['game_wins'] += max(game_score1 - game_score2, 0)
+                    player_stats[name]['game_losses'] += max(game_score2 - game_score1, 0)
+                # Attribute points earned and conceded to every Team 2 player.
+                for name in team2:
+                    player_stats[name]['game_wins'] += max(game_score2 - game_score1, 0)
+                    player_stats[name]['game_losses'] += max(game_score1 - game_score2, 0)
+
+            # Count MVP awards for the player when their name is present on the day's row.
+            if isinstance(row['MVP'], str):
+                name = row['MVP'].strip()
+                if name in player_stats:
+                    player_stats[name]['mvp'] += 1
+            # Count Clown of the Match awards for the player when present.
+            if isinstance(row['Clown of the Match'], str):
+                name = row['Clown of the Match'].strip()
+                if name in player_stats:
+                    player_stats[name]['clown'] += 1
+
+            # Record the blended Elo for each participating player at this chronological day.
+            for name in team1 + team2:
+                stats = player_stats[name]
+                history_days = stats['days_played']
+                history_games = stats['game_wins'] + stats['game_losses']
+                history_day_pct = (stats['day_wins'] + 2.5) / (history_days + 5)
+                history_game_pct = (stats['game_wins'] + 5) / (history_games + 10)
+                history_mvp_rate = stats['mvp'] / history_days
+                history_clown_rate = stats['clown'] / history_days
+                history_confidence = min(history_days / 10, 1)
+                history_team_rating = 1500 + (
+                    player_ratings[name] - 1500
+                )
+                history_day_adjustment = (history_day_pct - 0.5) * 200
+                history_game_adjustment = (history_game_pct - 0.5) * 160
+                history_award_adjustment = (
+                    history_mvp_rate - history_clown_rate
+                ) * 150
+                history_rating = history_team_rating + history_confidence * (
+                    history_day_adjustment
+                    + history_game_adjustment
+                    + history_award_adjustment
+                ) * CONFIG["RATING_VARIANCE_SCALE"]
+                elo_history[name].append({
+                    'day': day_number,
+                    'rating': round(history_rating, 1),
+                })
+
+        rows = []
+        # Convert stored raw statistics into the final display fields for one scope.
+        for name, stats in player_stats.items():
+            # Count the player's field days to support records and low-sample confidence.
+            days_played = stats['days_played']
+            # Count scored and conceded game points to support the game-win percentage.
+            games_played = stats['game_wins'] + stats['game_losses']
+            # Shrink the day win percentage toward 50% using a five-day prior.
+            day_pct = (stats['day_wins'] + 5 * 0.5) / (days_played + 5)
+            # Shrink the game-point win percentage toward 50% using a ten-point prior.
+            game_pct = (stats['game_wins'] + 10 * 0.5) / (games_played + 10)
+            # Calculate MVP frequency so awards contribute as a rate rather than a raw count.
+            mvp_rate = stats['mvp'] / days_played if days_played else 0
+            # Calculate Clown of the Match frequency so awards apply a relative penalty.
+            clown_rate = stats['clown'] / days_played if days_played else 0
+            # Shrink players with fewer than ten days toward the 1500 baseline.
+            confidence = min(days_played / 10, 1)
+            # Expand team-strength Elo while preserving the 1500 baseline and relative team ranking.
+            team_strength_rating = 1500 + (player_ratings[name] - 1500)
+            # Convert day win percentage deviations into Elo adjustments.
+            day_adjustment = (day_pct - 0.5) * 200
+            # Convert game-point win percentage deviations into Elo adjustments.
+            game_adjustment = (game_pct - 0.5) * 160
+            # Add 150 Elo per MVP-per-day and subtract 150 Elo per Clown-per-day.
+            award_adjustment = (mvp_rate - clown_rate) * 150
+            # Blend team strength with personal records and awards, limited by sample confidence.
+            rating = team_strength_rating + confidence * (
+                day_adjustment + game_adjustment + award_adjustment
+            ) * CONFIG["RATING_VARIANCE_SCALE"]
+            # Summarize the typical strength of opponents faced by this player.
+            average_opponent_rating = (
+                sum(opponent_ratings[name]) / len(opponent_ratings[name])
+                if opponent_ratings[name]
+                else 1500
+            )
+            # Assemble all ranking and supporting statistics into one exportable row.
+            rows.append({
+                'name': name,
+                'score': round(rating, 1),
+                'rating': round(rating),
+                'average_opponent_rating': round(average_opponent_rating),
+                'day_record': f"{stats['day_wins']}-{stats['day_losses']}",
+                'day_pct': round(day_pct * 100, 1),
+                'game_pct': round(game_pct * 100, 1),
+                'mvp_rate': round(mvp_rate * 100, 1),
+                'clown_rate': round(clown_rate * 100, 1),
+                'mvp': stats['mvp'],
+                'clown': stats['clown'],
+                'days': days_played,
+                'history': elo_history[name],
+            })
+
+        # Sort from strongest displayed Elo to weakest, with names as a stable tie-breaker.
+        rows.sort(key=lambda row: (-row['score'], row['name'].lower()))
+        for rank, row in enumerate(rows, start=1):
+            row['rank'] = rank
+        rankings[scope] = rows
+
+    return rankings
 
 
 # CLASS/OBJECT DEFINITIONS
@@ -561,25 +722,11 @@ def read_excel(filename: str, season: int = None, new_day: bool = False) -> List
             if str(e) != "New day entry cancelled by user":
                 raise
     
-    for index, row in days_df.iterrows():
-        # Extract year from date, whether it's a string or datetime
-        if isinstance(row['Date'], pd.Timestamp):
-            year_full = row['Date'].year
-        else:
-            date_str = str(row['Date'])
-            try:
-                # Try parsing as MM/DD/YYYY
-                if "-" in date_str:
-                    year_full = int(date_str.split("-")[0])
-                else:
-                    year_part = int(date_str.split("/")[-1])
-                    year_full = year_part if year_part > 1000 else 2000 + year_part
-            except Exception:
-                print(f"Warning: Invalid date format '{date_str}' at row {index}. Skipping row.")
-                continue
+    for _, row in days_df.iterrows():
+        year_full = extract_year(row['Date'])
         if not season or (season and year_full == int(season)):
-            team1 = init_team(row['Team 1'].split(", "))
-            team2 = init_team(row['Team 2'].split(", "))
+            team1 = init_team([name.strip() for name in str(row['Team 1']).split(",")])
+            team2 = init_team([name.strip() for name in str(row['Team 2']).split(",")])
             score = row['Score']
             if isinstance(row['MVP'], str):
                 today_mvp = get_player(row['MVP'])
@@ -768,7 +915,7 @@ def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
     days = pd.read_excel(filename, sheet_name="Days")
     
     # Convert dates to proper format
-    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='coerce')
+    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='raise')
     days = days.sort_values('Date', ascending=False)
     
     days_data = days.to_dict('records')
@@ -787,7 +934,7 @@ def export_days_to_json(filename: str, output_dir: str = "./data") -> None:
             else:
                 if key == 'Date':
                     if not isinstance(value, pd.Timestamp):
-                        value = pd.to_datetime(value, format='mixed', errors='coerce')
+                        value = pd.to_datetime(value, format='mixed', errors='raise')
                     if pd.isna(value):
                         cleaned_day[key] = None
                         cleaned_day['year'] = None
@@ -807,7 +954,6 @@ def export_season_stats_to_json(filename: str, output_dir: str = "./data") -> No
     
     Args:
         filename (str): Path to the Excel file.
-        seasons_range (range): Range of seasons to export.
         output_dir (str): Directory to save JSON files to.
     """
     output_path = Path(output_dir)
@@ -815,23 +961,16 @@ def export_season_stats_to_json(filename: str, output_dir: str = "./data") -> No
     
     season_stats = {}
     
-    # Read main stats
-    try:
-        stats_df = pd.read_excel(filename, sheet_name="Stats")
-        season_stats['total'] = stats_df.to_dict('records')
-    except Exception:
-        pass
+    stats_df = pd.read_excel(filename, sheet_name="Stats")
+    season_stats['total'] = stats_df.to_dict('records')
     
     # Read season-specific stats
     excel = pd.ExcelFile(filename)
     for sheet in excel.sheet_names:
         if sheet.endswith(" Stats") and sheet != "Stats":
             year = sheet.replace(" Stats", "")
-            try:
-                season_df = pd.read_excel(filename, sheet_name=sheet)
-                season_stats[year] = season_df.to_dict('records')
-            except Exception:
-                continue
+            season_df = pd.read_excel(filename, sheet_name=sheet)
+            season_stats[year] = season_df.to_dict('records')
     
     # Clean NaN values
     cleaned_season_stats = {}
@@ -852,11 +991,11 @@ def export_season_stats_to_json(filename: str, output_dir: str = "./data") -> No
         json.dump(cleaned_season_stats, f, indent=2)
     
 
-def export_metadata_to_json(seasons_range: range, players_list: List[str], output_dir: str = "./data") -> None:
+def export_metadata_to_json(seasons: List[int], players_list: List[str], output_dir: str = "./data") -> None:
     """Export metadata (seasons and players) for GitHub Pages.
     
     Args:
-        seasons_range (range): Range of seasons.
+        seasons (List[int]): Seasons found in the Excel data.
         players_list (List[str]): List of all players.
         output_dir (str): Directory to save JSON files to.
     """
@@ -864,28 +1003,40 @@ def export_metadata_to_json(seasons_range: range, players_list: List[str], outpu
     output_path.mkdir(exist_ok=True)
     
     metadata = {
-        "seasons": list(seasons_range),
+        "seasons": seasons,
         "players": players_list,
         "game_types": list(CONFIG["GAME_TYPES"].keys())
     }
     
     with open(output_path / "metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)
+
+
+def export_rankings_to_json(filename: str, seasons: List[int], output_dir: str = "./data") -> None:
+    """Export composite player rankings derived from the Days sheet."""
+    output_path = Path(output_dir)
+    output_path.mkdir(exist_ok=True)
+    days_df = pd.read_excel(filename, sheet_name="Days")
+    rankings = build_rankings(days_df, seasons)
+
+    with open(output_path / "rankings.json", "w") as f:
+        json.dump(rankings, f, indent=2)
         
 
-def export_all_data(filename: str, seasons_range: range, players_list: List[str], output_dir: str = "./docs/data") -> None:
+def export_all_data(filename: str, seasons: List[int], players_list: List[str], output_dir: str = "./docs/data") -> None:
     """Export all necessary data for GitHub Pages site.
     
     Args:
         filename (str): Path to the Excel file.
-        seasons_range (range): Range of seasons.
+        seasons (List[int]): Seasons found in the Excel data.
         players_list (List[str]): List of all players.
         output_dir (str): Directory to save JSON files to.
     """
     export_teams_to_json(filename, output_dir)
     export_days_to_json(filename, output_dir)
     export_season_stats_to_json(filename, output_dir)
-    export_metadata_to_json(seasons_range, players_list, output_dir)
+    export_metadata_to_json(seasons, players_list, output_dir)
+    export_rankings_to_json(filename, seasons, output_dir)
     print("All data exported successfully")
 
 
@@ -900,40 +1051,28 @@ def main() -> None:
     
     filename = CONFIG["EXCEL_FILE"]
     
-    # Initialize player names and seasons from Excel file
-    try:
-        player_names = extract_player_names(filename)
-        CONFIG["SEASONS_RANGE"] = extract_seasons(filename)
-        print(f"Loaded {len(player_names)} players from Excel:")
-        print(", ".join(player_names))
-        print(f"Seasons: {min(CONFIG['SEASONS_RANGE'])} to {max(CONFIG['SEASONS_RANGE'])}")
-    except Exception as e:
-        print(f"Error initializing from Excel file: {e}")
-        return 1
+    player_names = extract_player_names(filename)
+    seasons = extract_seasons(filename)
+    print(f"Loaded {len(player_names)} players from Excel:")
+    print(", ".join(player_names))
+    print("Seasons:", ", ".join(str(season) for season in seasons))
     
     new_day = input("Do you want to add a new day? (y/n): ").strip().lower() in ['y', 'yes']
     
-    try:
-        print("Processing all field days...")
-        days = read_excel(filename, new_day=new_day)
-        parse_days(days)
-        update_excel(filename)
-        print(f"Processing {len(days)} total days")
+    print("Processing all field days...")
+    days = read_excel(filename, new_day=new_day)
+    parse_days(days)
+    update_excel(filename)
+    print(f"Processing {len(days)} total days")
 
-        # Process individual seasons
-        for season in CONFIG["SEASONS_RANGE"]:
-            yr_days = read_excel(filename, season)
-            parse_days(yr_days)
-            active_players = get_active_players(yr_days)
-            update_excel(filename, season, active_players)
-            print(f"Processed {len(yr_days)} days for {season} season")
-        
-        # Export all data for GitHub Pages
-        export_all_data(filename, CONFIG["SEASONS_RANGE"], player_names)
-    
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return 1
+    for season in seasons:
+        yr_days = read_excel(filename, season)
+        parse_days(yr_days)
+        active_players = get_active_players(yr_days)
+        update_excel(filename, season, active_players)
+        print(f"Processed {len(yr_days)} days for {season} season")
+
+    export_all_data(filename, seasons, player_names)
     
     return 0
 

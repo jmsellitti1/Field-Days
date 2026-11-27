@@ -1,6 +1,8 @@
 from flask import Flask, render_template, jsonify
 import pandas as pd
 
+from program import build_rankings, extract_seasons
+
 app = Flask(__name__)
 
 def load_data():
@@ -17,19 +19,17 @@ def load_data():
     for sheet in excel.sheet_names:
         if sheet.endswith(" Stats") and sheet != "Stats":
             year = sheet.replace(" Stats", "")
-            try:
-                season_stats[year] = excel.parse(sheet_name=sheet)
-            except (ValueError, KeyError) as e:
-                continue
+            season_stats[year] = excel.parse(sheet_name=sheet)
             
-    return teams, days, season_stats
+    rankings = build_rankings(days, extract_seasons(excel_file))
+    return teams, days, season_stats, rankings
 
 @app.route('/')
 def index():
-    teams, days, season_stats = load_data()
+    teams, days, season_stats, rankings = load_data()
     teams_data = teams.to_dict('records')
 
-    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='coerce')
+    days['Date'] = pd.to_datetime(days['Date'], format='mixed', errors='raise')
     days = days.sort_values('Date', ascending=False)
     
     days_data = days.to_dict('records')
@@ -40,7 +40,7 @@ def index():
             day['Date'] = ''
         else:
             if not isinstance(date_obj, pd.Timestamp):
-                date_obj = pd.to_datetime(date_obj, format='mixed', errors='coerce')
+                date_obj = pd.to_datetime(date_obj, format='mixed', errors='raise')
             if pd.isna(date_obj):
                 day['year'] = None
                 day['Date'] = ''
@@ -65,7 +65,8 @@ def index():
     return render_template('index.html', 
                          teams=teams_data,
                          days=days_data,
-                         season_stats=cleaned_season_stats)
+                         season_stats=cleaned_season_stats,
+                         rankings=rankings)
 
 @app.route('/health')
 def health_check():

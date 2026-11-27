@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Field Days Statistics</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -14,6 +15,8 @@
 
         <nav id="nav-buttons">
             <button class="nav-btn active" data-section="seasons">Player Stats</button>
+            <button class="nav-btn" data-section="rankings">Player Rankings</button>
+            <button class="nav-btn" data-section="game-stats">Game Stats</button>
             <button class="nav-btn" data-section="teams">Teams</button>
             <button class="nav-btn" data-section="days">Game History</button>
         </nav>
@@ -50,6 +53,62 @@
                             <th>MVP</th>
                             <th>Clown</th>
                             <th class="name-col name-col-last">(Name)</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Rankings Section -->
+        <section id="rankings">
+            <div class="section-header">
+                <h2>Player Rankings</h2>
+                <select id="ranking-season-select">
+                    <option value="total">All Time</option>
+                </select>
+            </div>
+            <p class="ranking-method">
+                Elo combines opponent-adjusted team strength with shrunk day and game
+                win percentages, plus MVP and Clown of the Match rates. Ratings start
+                at 1500 and low-sample players are moved toward the baseline.
+            </p>
+            <div class="table-container">
+                <table id="rankings-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Elo Rating</th>
+                            <th>Avg Opponent Elo</th>
+                            <th>Days</th>
+                            <th>Day %</th>
+                            <th>Game Point %</th>
+                            <th>MVP</th>
+                            <th>Clown</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Game Stats Section -->
+        <section id="game-stats">
+            <div class="section-header">
+                <h2>Game Statistics</h2>
+                <select id="game-season-select">
+                    <option value="total">All Time</option>
+                </select>
+            </div>
+            <div id="game-button-list" class="game-buttons"></div>
+            <div class="table-container">
+                <table id="game-stats-table">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Record</th>
+                            <th>Win %</th>
                         </tr>
                     </thead>
                     <tbody></tbody>

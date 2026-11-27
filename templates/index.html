@@ -56,6 +56,7 @@
             <h1>Field Days Statistics</h1>
             <nav>
                 <button onclick="showSection('stats')" class="active">Player Stats</button>
+                <button onclick="showSection('rankings')">Player Rankings</button>
                 <button onclick="showSection('gamestats')">Game Stats</button>
                 <button onclick="showSection('teams')">Team Combinations</button>
                 <button onclick="showSection('days')">Game History</button>
@@ -99,6 +100,58 @@
                 </div>
                 <div class="chart-container" style="height: 400px; margin-top: 20px;">
                     <canvas id="playerStatsScatter"></canvas>
+                </div>
+            </section>
+
+            <section id="rankings">
+                <div class="section-header">
+                    <h2>Player Rankings</h2>
+                    <select id="rankingSeasonSelect" class="season-select" onchange="updateRankings()">
+                        <option value="total">All Time</option>
+                        {% for year in rankings.keys()|sort if year != 'total' %}
+                            <option value="{{ year }}">{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <p class="ranking-method">
+                    Elo combines opponent-adjusted team strength with shrunk day and game
+                    win percentages, plus MVP and Clown of the Match rates. Ratings start
+                    at 1500 and low-sample players are moved toward the baseline.
+                </p>
+                <div class="table-container">
+                    <table id="rankings-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Player</th>
+                                <th>Elo Rating</th>
+                                <th>Avg Opponent Elo</th>
+                                <th>Days</th>
+                                <th>Day %</th>
+                                <th>Game Point %</th>
+                                <th>MVP</th>
+                                <th>Clown</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player in rankings['total'] %}
+                            <tr>
+                                <td>{{ player.rank }}</td>
+                                <td>{{ player.name }}</td>
+                                <td>{{ "%.1f"|format(player.score) }}</td>
+                                <td>{{ player.average_opponent_rating }}</td>
+                                <td>{{ player.day_record }} ({{ player.days }} days)</td>
+                                <td>{{ "%.1f"|format(player.day_pct) }}%</td>
+                                <td>{{ "%.1f"|format(player.game_pct) }}%</td>
+                                <td>{{ player.mvp }}</td>
+                                <td>{{ player.clown }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="chart-container elo-history-container" style="height: 460px; margin-top: 16px;">
+                    <canvas id="eloHistoryChart"></canvas>
                 </div>
             </section>
 
@@ -335,9 +388,11 @@
 
         let originalGameStats = {};
         let seasonStats = JSON.parse('{{ season_stats|tojson|safe }}');
+        let rankings = JSON.parse('{{ rankings|tojson|safe }}');
         let gameStatsChart = null;
         let gameStatsScatterChart = null;
         let playerStatsScatterChart = null;
+        let eloHistoryChart = null;
 
         function getChartColors() {
             const isDarkMode = document.body.classList.contains('dark-mode');
@@ -444,6 +499,7 @@
             // Initialize player stats scatter plot
             const initialSeason = document.getElementById('playerStatsSeasonSelect').value;
             updatePlayerStatsScatter(initialSeason);
+            updateEloHistory(document.getElementById('rankingSeasonSelect').value);
 
             if (darkModeToggle) darkModeToggle.addEventListener('click', () => {
                 body.classList.toggle('dark-mode');
@@ -465,6 +521,126 @@
             });
             
         });
+
+        function updateRankings() {
+            const season = document.getElementById('rankingSeasonSelect').value;
+            const tbody = document.querySelector('#rankings-table tbody');
+            tbody.innerHTML = '';
+
+            (rankings[season] || []).forEach(player => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${player.rank}</td>
+                    <td>${player.name}</td>
+                    <td>${player.score.toFixed(1)}</td>
+                    <td>${player.average_opponent_rating}</td>
+                    <td>${player.day_record} (${player.days} days)</td>
+                    <td>${player.day_pct.toFixed(1)}%</td>
+                    <td>${player.game_pct.toFixed(1)}%</td>
+                    <td>${player.mvp}</td>
+                    <td>${player.clown}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            updateEloHistory(season);
+        }
+
+        function updateEloHistory(season) {
+            const ctx = document.getElementById('eloHistoryChart').getContext('2d');
+            if (eloHistoryChart) {
+                eloHistoryChart.destroy();
+            }
+
+            const players = rankings[season] || [];
+            const datasets = players
+                .filter(player => player.history && player.history.length > 0)
+                .map((player, index) => ({
+                    label: player.name,
+                    data: player.history.map(point => ({
+                        x: point.day,
+                        y: point.rating
+                    })),
+                    borderColor: `hsl(${(index * 137.508) % 360} 70% 45%)`,
+                    backgroundColor: `hsl(${(index * 137.508) % 360} 70% 45%)`,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHitRadius: 8,
+                    tension: 0.15
+                }));
+
+            const maxDay = players.reduce((maximum, player) => {
+                const history = player.history || [];
+                return history.length
+                    ? Math.max(maximum, history[history.length - 1].day)
+                    : maximum;
+            }, 0);
+
+            const nameLabelsPlugin = {
+                id: 'eloNameLabels',
+                afterDatasetsDraw(chart) {
+                    const context = chart.ctx;
+                    context.save();
+                    chart.data.datasets.forEach((dataset, datasetIndex) => {
+                        const meta = chart.getDatasetMeta(datasetIndex);
+                        if (!meta.hidden && meta.data.length) {
+                            const point = meta.data[meta.data.length - 1];
+                            context.fillStyle = dataset.borderColor;
+                            context.font = '600 12px Inter, sans-serif';
+                            context.textAlign = 'left';
+                            context.textBaseline = 'middle';
+                            context.fillText(dataset.label, point.x + 8, point.y);
+                        }
+                    });
+                    context.restore();
+                }
+            };
+
+            eloHistoryChart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                plugins: [nameLabelsPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: { padding: { right: 100 } },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Elo Change Over Time${season !== 'total' ? ' (' + season + ')' : ''}`,
+                            color: getChartColors().textColor
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: items => `Field Day ${items[0].parsed.x}`,
+                                label: item => `${item.dataset.label}: ${item.parsed.y.toFixed(1)} Elo`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 1,
+                            max: Math.max(maxDay, 1),
+                            ticks: {
+                                precision: 0,
+                                callback: value => Number.isInteger(value) ? value : ''
+                            },
+                            title: {
+                                display: true,
+                                text: 'Field day'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Elo Rating'
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         function updatePlayerStats() {
             const season = document.getElementById('playerStatsSeasonSelect').value;
