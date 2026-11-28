@@ -201,15 +201,24 @@ def build_rankings(days_df: pd.DataFrame, seasons: List[int]) -> Dict[str, List[
                 history_mvp_rate = stats['mvp'] / history_days
                 history_clown_rate = stats['clown'] / history_days
                 history_confidence = min(history_days / 10, 1)
-                history_team_rating = 1500 + (
-                    player_ratings[name] - 1500
+                history_average_opponent_rating = (
+                    sum(opponent_ratings[name]) / len(opponent_ratings[name])
+                    if opponent_ratings[name]
+                    else 1500
+                )
+                history_expected_game_pct = 1 / (
+                    1 + 10 ** (
+                        (history_average_opponent_rating - player_ratings[name]) / 400
+                    )
                 )
                 history_day_adjustment = (history_day_pct - 0.5) * 200
-                history_game_adjustment = (history_game_pct - 0.5) * 160
+                history_game_adjustment = (
+                    history_game_pct - history_expected_game_pct
+                ) * 160
                 history_award_adjustment = (
                     history_mvp_rate - history_clown_rate
-                ) * 150
-                history_rating = history_team_rating + history_confidence * (
+                ) * 100
+                history_rating = player_ratings[name] + history_confidence * (
                     history_day_adjustment
                     + history_game_adjustment
                     + history_award_adjustment
@@ -224,7 +233,7 @@ def build_rankings(days_df: pd.DataFrame, seasons: List[int]) -> Dict[str, List[
         for name, stats in player_stats.items():
             # Count the player's field days to support records and low-sample confidence.
             days_played = stats['days_played']
-            # Count scored and conceded game points to support the game-win percentage.
+            # Count scored and conceded games to support the game-win percentage.
             games_played = stats['game_wins'] + stats['game_losses']
             # Shrink the day win percentage toward 50% using a five-day prior.
             day_pct = (stats['day_wins'] + 5 * 0.5) / (days_played + 5)
@@ -236,24 +245,29 @@ def build_rankings(days_df: pd.DataFrame, seasons: List[int]) -> Dict[str, List[
             clown_rate = stats['clown'] / days_played if days_played else 0
             # Shrink players with fewer than ten days toward the 1500 baseline.
             confidence = min(days_played / 10, 1)
-            # Expand team-strength Elo while preserving the 1500 baseline and relative team ranking.
-            team_strength_rating = 1500 + (player_ratings[name] - 1500)
-            # Convert day win percentage deviations into Elo adjustments.
-            day_adjustment = (day_pct - 0.5) * 200
-            # Convert game-point win percentage deviations into Elo adjustments.
-            game_adjustment = (game_pct - 0.5) * 160
-            # Add 150 Elo per MVP-per-day and subtract 150 Elo per Clown-per-day.
-            award_adjustment = (mvp_rate - clown_rate) * 150
-            # Blend team strength with personal records and awards, limited by sample confidence.
-            rating = team_strength_rating + confidence * (
-                day_adjustment + game_adjustment + award_adjustment
-            ) * CONFIG["RATING_VARIANCE_SCALE"]
+            established_player_rating = player_ratings[name]
             # Summarize the typical strength of opponents faced by this player.
             average_opponent_rating = (
                 sum(opponent_ratings[name]) / len(opponent_ratings[name])
                 if opponent_ratings[name]
                 else 1500
             )
+            expected_game_pct = 1 / (
+                1 + 10 ** (
+                    (average_opponent_rating - established_player_rating) / 400
+                )
+            )
+            actual_game_pct = game_pct
+            # Convert day win percentage deviations into Elo adjustments.
+            day_adjustment = (day_pct - 0.5) * 200
+            # Reward game performance above expectation based on opponent strength.
+            game_adjustment = (actual_game_pct - expected_game_pct) * 160
+            # Add 100 Elo per MVP-per-day and subtract 100 Elo per Clown-per-day.
+            award_adjustment = (mvp_rate - clown_rate) * 100
+            # Add confidence-weighted personal performance to the established Elo.
+            rating = established_player_rating + confidence * (
+                day_adjustment + game_adjustment + award_adjustment
+            ) * CONFIG["RATING_VARIANCE_SCALE"]
             # Assemble all ranking and supporting statistics into one exportable row.
             rows.append({
                 'name': name,
